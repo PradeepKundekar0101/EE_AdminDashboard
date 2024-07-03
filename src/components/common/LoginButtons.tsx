@@ -1,15 +1,20 @@
 // src/components/LoginButton.js
-import { useDispatch } from 'react-redux';
-import { login } from '../../store/reducers/authReducer';
+import { useDispatch } from 'react-redux'
+import { login } from '../../store/reducers/authReducer'
+import CustomLayout from '../layout/custom-layout/CustomLayout'
 
 const LoginButton = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   const handleLogin = () => {
-    dispatch(login({ id: 1, name: 'John Doe' }));
-  };
+    dispatch(login({ id: 1, name: 'John Doe' }))
+  }
 
-  return <button onClick={handleLogin}>Login</button>;
-};
+  return (
+    <CustomLayout>
+      <button onClick={handleLogin}>Login</button>
+    </CustomLayout>
+  )
+}
 
-export default LoginButton;
+export default LoginButton
