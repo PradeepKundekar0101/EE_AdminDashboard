@@ -13,7 +13,7 @@ const CustomButton: FC<CustomButtonProps> = ({ children, className, ...props }) 
     <Button
       {...props}
       className={classNames(
-        'bg-dark-teal hover:bg-gray-700 text-white rounded-md py-2 px-4',
+        ' hover:bg-gray-700 rounded-md py-2 px-4',
         className
       )}
     >
