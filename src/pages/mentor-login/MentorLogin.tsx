@@ -92,8 +92,9 @@ const MentorLogin: React.FC = () => {
             type='default'
             htmlType='submit'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
+            
           >
-            Admin Login
+           <Link to='/admin-login'>Admin Login</Link> 
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>

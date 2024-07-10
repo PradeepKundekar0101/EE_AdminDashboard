@@ -24,7 +24,7 @@ const schema = yup
   })
   .required()
 
-const MentorLogin: React.FC = () => {
+const AdminLogin: React.FC = () => {
   const {
     control,
     handleSubmit,
@@ -95,7 +95,7 @@ const MentorLogin: React.FC = () => {
             htmlType='submit'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
           >
-            Mentor Login
+          <Link to='/mentor-login'> Mentor Login</Link>
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>
@@ -122,4 +122,4 @@ const MentorLogin: React.FC = () => {
   )
 }
 
-export default MentorLogin
+export default AdminLogin
