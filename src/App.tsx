@@ -1,9 +1,12 @@
 import './App.css'
-import LoginButton from './components/common/LoginButtons'
-import CreateMentor from './pages/form/CreateMentor'
-import Questions from './pages/questions/Questions';
-import UserProfile from './pages/user-profile/UserProfile'
-import LoginForm from './pages/mentor-login/MentorLogin';
+import React, { useEffect } from "react";
+// import { useAppContext } from "./AppContext";
+// import { Toaster } from "react-hot-toast";
+import AuthenticatedLayout from "./components/layout/authenticated-layour/AuthenticatedLayout";
+import UnauthenticatedLayout from "./components/layout/unauthenticated-layout/UnauthenticatedLayout"
+// import { BASE_URL } from "./utils/url.ts";
+import axios from "axios";
+
 
 // Import only specific weights and styles
 import '@fontsource/roboto/300.css'; // Light weight
@@ -12,12 +15,14 @@ import '@fontsource/roboto/500.css'; // Medium weight
 import '@fontsource/roboto/700.css'; // Bold weight
 
 
-function App () {
-  return (
-    <>
-      <LoginForm />
-    </>
-  )
-}
+const App = () => {
+  const isLoggedIn = true;
 
-export default App
+  return (
+    <div>
+      {isLoggedIn ? <AuthenticatedLayout /> : <UnauthenticatedLayout />}
+    </div>
+  );
+};
+
+export default App;
