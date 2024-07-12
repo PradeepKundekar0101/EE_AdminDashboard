@@ -1,10 +1,8 @@
 import './App.css'
 import React, { useEffect } from "react";
 // import { useAppContext } from "./AppContext";
-// import { Toaster } from "react-hot-toast";
 import AuthenticatedLayout from "./components/layout/authenticated-layour/AuthenticatedLayout";
 import UnauthenticatedLayout from "./components/layout/unauthenticated-layout/UnauthenticatedLayout"
-// import { BASE_URL } from "./utils/url.ts";
 import axios from "axios";
 
 
@@ -16,7 +14,9 @@ import '@fontsource/roboto/700.css'; // Bold weight
 
 
 const App = () => {
-  const isLoggedIn = true;
+  const userDetails = localStorage.getItem('user')
+  const isLoggedIn = userDetails ? true : false; 
+
 
   return (
     <div>

@@ -1,17 +1,17 @@
-// import './styles.css' // Import custom styles
-import React from 'react'
-import { useForm, SubmitHandler, Controller } from 'react-hook-form'
-import { yupResolver } from '@hookform/resolvers/yup'
-import * as yup from 'yup'
-import { Input, Form as AntdForm } from 'antd'
-import CustomButton from '../../components/ui/button/Button'
-import FormLayout from '../../components/layout/form-layout/FormLayout'
-import FormImg from '../../assets/images/form-img.png'
-import { Link } from 'react-router-dom'
+import React from 'react';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Input, Form as AntdForm, message } from 'antd';
+import CustomButton from '../../components/ui/button/Button';
+import FormLayout from '../../components/layout/form-layout/FormLayout';
+import FormImg from '../../assets/images/form-img.png';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 interface IFormInput {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 const schema = yup
@@ -20,23 +20,35 @@ const schema = yup
     password: yup
       .string()
       .required('Password is required')
-      .min(8, 'Password must be at least 8 characters')
+      .min(8, 'Password must be at least 8 characters'),
   })
-  .required()
+  .required();
 
 const AdminLogin: React.FC = () => {
   const {
     control,
     handleSubmit,
-    formState: { errors }
+    formState: { errors },
   } = useForm<IFormInput>({
-    //@ts-ignore
-    resolver: yupResolver(schema)
-  })
+    resolver: yupResolver(schema),
+  });
 
-  const onSubmit: SubmitHandler<IFormInput> = data => {
-    console.log(data)
-  }
+  const navigate = useNavigate();
+
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/login`, data);
+      if (response.data.success) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem('token', response.data.token);
+        navigate('/user-profile');
+      } else {
+        message.error(response.data.message || 'Login failed');
+      }
+    } catch (error: any) {
+      message.error(error.response?.data?.message || 'An error occurred. Please try again.');
+    }
+  };
 
   const form = (
     <div className='max-w-sm'>
@@ -50,10 +62,7 @@ const AdminLogin: React.FC = () => {
             name='email'
             control={control}
             render={({ field }) => (
-              <Input
-                {...field}
-                className=' text-black focus:ring-2 focus:ring-blue-500'
-              />
+              <Input {...field} className=' text-black focus:ring-2 focus:ring-blue-500' />
             )}
           />
         </AntdForm.Item>
@@ -67,10 +76,7 @@ const AdminLogin: React.FC = () => {
             name='password'
             control={control}
             render={({ field }) => (
-              <Input.Password
-                {...field}
-                className=' text-black focus:ring-2 h-[48px] bg-input-bg rounded-xl  focus:ring-blue-500'
-              />
+              <Input.Password {...field} className=' text-black focus:ring-2 h-[48px] bg-input-bg rounded-xl  focus:ring-blue-500' />
             )}
           />
         </AntdForm.Item>
@@ -92,10 +98,10 @@ const AdminLogin: React.FC = () => {
         <AntdForm.Item>
           <CustomButton
             type='default'
-            htmlType='submit'
+            htmlType='button'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
           >
-          <Link to='/mentor-login'> Mentor Login</Link>
+            <Link to='/mentor-login'> Mentor Login</Link>
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>
@@ -109,7 +115,7 @@ const AdminLogin: React.FC = () => {
         </AntdForm.Item>
       </AntdForm>
     </div>
-  )
+  );
 
   return (
     <FormLayout
@@ -119,7 +125,7 @@ const AdminLogin: React.FC = () => {
       form={form}
       reverse={true}
     />
-  )
-}
+  );
+};
 
-export default AdminLogin
+export default AdminLogin;
