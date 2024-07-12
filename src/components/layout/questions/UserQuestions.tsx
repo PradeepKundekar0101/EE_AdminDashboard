@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 import {
   Table,
   Tag,
@@ -9,8 +9,10 @@ import {
   Input,
   Select,
   Checkbox,
-  Modal
-} from 'antd'
+  Modal,
+  Switch,
+  message,
+} from 'antd';
 import {
   LineChart,
   Line,
@@ -20,145 +22,159 @@ import {
   Tooltip,
   Legend,
   BarChart,
-  Bar
-} from 'recharts'
-import EditIcon from '../../../assets/images/edit.svg'
-import DeleteIcon from '../../../assets/images/trash.svg'
+  Bar,
+} from 'recharts';
+import EditIcon from '../../../assets/images/edit.svg';
+import DeleteIcon from '../../../assets/images/trash.svg';
+import axios from 'axios';
 
-const { Option } = Select
+const { Option } = Select;
+
+const QUESTION_URL = import.meta.env.VITE_BASE_URL + '/question';
 
 interface Question {
-  key: string
-  question: string
-  type: string
-  responses: number
-  created: string
-  status: string
+  key: string;
+  question: string;
+  type: string;
+  responses: number;
+  created: string;
+  status: string;
+  isPre: boolean;
+  required: boolean;
 }
 
-const data: Question[] = [
-  {
-    key: '1',
-    question: 'Sample Question 1',
-    type: 'Text',
-    responses: 4,
-    created: '7 days ago',
-    status: 'Active'
-  },
-  {
-    key: '2',
-    question: 'Sample Question 2',
-    type: 'Number',
-    responses: 5,
-    created: '7 days ago',
-    status: 'Active'
-  },
-  {
-    key: '3',
-    question: 'Sample Question 3',
-    type: 'Selection',
-    responses: 4,
-    created: '7 days ago',
-    status: 'Inactive'
-  },
-  {
-    key: '4',
-    question: 'Sample Question 4',
-    type: 'Text',
-    responses: 4,
-    created: '7 days ago',
-    status: 'Active'
-  }
-]
-
-const responseData = [
-  { name: 'Apr 10', Entry1: 4000, Entry2: 2400 },
-  { name: 'Apr 17', Entry1: 3000, Entry2: 1398 },
-  { name: 'Apr 24', Entry1: 2000, Entry2: 9800 },
-  { name: 'May 01', Entry1: 2780, Entry2: 3908 },
-  { name: 'May 08', Entry1: 1890, Entry2: 4800 },
-  { name: 'May 15', Entry1: 2390, Entry2: 3800 },
-  { name: 'May 23', Entry1: 3490, Entry2: 4300 }
-]
-
-const performanceData = [
-  { name: 'Jan', uv: 4000 },
-  { name: 'Mar', uv: 3000 },
-  { name: 'May', uv: 2000 },
-  { name: 'Jul', uv: 2780 }
-]
-
 const JournalManagement: React.FC = () => {
-  const [drawerVisible, setDrawerVisible] = useState(false)
-  const [drawerType, setDrawerType] = useState<'add' | 'edit'>('add')
-  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null)
-  const [deleteModalVisible, setDeleteModalVisible] = useState(false)
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [drawerType, setDrawerType] = useState<'add' | 'edit'>('add');
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [form] = Form.useForm();
 
-  const [form] = Form.useForm()
+  const token = localStorage.getItem('token');
 
-  const showDrawer = (
-    type: 'add' | 'edit',
-    question: Question | null = null
-  ) => {
-    setDrawerType(type)
-    setCurrentQuestion(question)
-    setDrawerVisible(true)
-    if (question) {
-      form.setFieldsValue(question)
-    } else {
-      form.resetFields()
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+
+  const fetchQuestions = async () => {
+    try {
+      const response = await axios.get(QUESTION_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.data.status === 'success') {
+        const fetchedQuestions = response.data.data.map((q: any) => ({
+          key: q._id,
+          question: q.title,
+          type: q.type,
+          responses: 0, // Assuming 0 responses as no response data in the API
+          created: new Date(q.createdAt).toDateString(),
+          status: q.status ? 'Active' : 'Inactive',
+          isPre: q.isPre,
+          required: q.isRequired,
+        }));
+        setQuestions(fetchedQuestions);
+      } else {
+        message.error('Failed to fetch questions');
+      }
+    } catch (error) {
+      message.error('An error occurred while fetching questions');
     }
-  }
+  };
+
+  const showDrawer = (type: 'add' | 'edit', question: Question | null = null) => {
+    setDrawerType(type);
+    setCurrentQuestion(question);
+    setDrawerVisible(true);
+    if (question) {
+      form.setFieldsValue(question);
+    } else {
+      form.resetFields();
+    }
+  };
 
   const closeDrawer = () => {
-    setDrawerVisible(false)
-    setCurrentQuestion(null)
-  }
+    setDrawerVisible(false);
+    setCurrentQuestion(null);
+  };
 
   const showDeleteConfirm = (question: Question) => {
-    setCurrentQuestion(question)
-    setDeleteModalVisible(true)
-  }
+    setCurrentQuestion(question);
+    setDeleteModalVisible(true);
+  };
 
-  const handleDelete = () => {
-    // Call delete API
-    setDeleteModalVisible(false)
-    setCurrentQuestion(null)
-  }
+  const handleDelete = async () => {
+    try {
+      await axios.delete(`${QUESTION_URL}/delete/${currentQuestion?.key}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      message.success('Question deleted successfully');
+      fetchQuestions();
+      setDeleteModalVisible(false);
+      setCurrentQuestion(null);
+    } catch (error) {
+      message.error('An error occurred while deleting the question');
+    }
+  };
 
   const handleEdit = (record: Question) => {
-    showDrawer('edit', record)
-  }
+    showDrawer('edit', record);
+  };
 
-  const handleFormSubmit = (values: any) => {
-    if (drawerType === 'add') {
-      // Call API to add question
-    } else {
-      // Call API to update question
+  const handleFormSubmit = async (values: any) => {
+    const payload = {
+      ...values,
+      status: true, // Set status to true by default
+    };
+
+    try {
+      if (drawerType === 'add') {
+        await axios.post(`${QUESTION_URL}/create`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        message.success('Question added successfully');
+      } else {
+        // console.log(`${QUESTION_URL}/update/${currentQuestion?.key}`)
+        await axios.put(`${QUESTION_URL}/update/${currentQuestion?.key}`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        message.success('Question updated successfully');
+      }
+      fetchQuestions();
+      closeDrawer();
+    } catch (error) {
+      message.error('An error occurred while submitting the form');
     }
-    closeDrawer()
-  }
+  };
 
   const columns = [
     {
       title: 'Question',
       dataIndex: 'question',
-      key: 'question'
+      key: 'question',
     },
     {
       title: 'Type',
       dataIndex: 'type',
-      key: 'type'
+      key: 'type',
     },
     {
       title: 'Responses',
       dataIndex: 'responses',
-      key: 'responses'
+      key: 'responses',
     },
     {
       title: 'Created',
       dataIndex: 'created',
-      key: 'created'
+      key: 'created',
     },
     {
       title: 'Status',
@@ -168,7 +184,7 @@ const JournalManagement: React.FC = () => {
         <Tag color={status === 'Active' ? 'green' : 'red'}>
           {status.toUpperCase()}
         </Tag>
-      )
+      ),
     },
     {
       title: 'Action',
@@ -188,9 +204,26 @@ const JournalManagement: React.FC = () => {
             onClick={() => showDeleteConfirm(record)}
           />
         </Space>
-      )
-    }
-  ]
+      ),
+    },
+  ];
+
+  const responseData = [
+    { name: 'Apr 10', Entry1: 4000, Entry2: 2400 },
+    { name: 'Apr 17', Entry1: 3000, Entry2: 1398 },
+    { name: 'Apr 24', Entry1: 2000, Entry2: 9800 },
+    { name: 'May 01', Entry1: 2780, Entry2: 3908 },
+    { name: 'May 08', Entry1: 1890, Entry2: 4800 },
+    { name: 'May 15', Entry1: 2390, Entry2: 3800 },
+    { name: 'May 23', Entry1: 3490, Entry2: 4300 },
+  ];
+
+  const performanceData = [
+    { name: 'Jan', uv: 4000 },
+    { name: 'Mar', uv: 3000 },
+    { name: 'May', uv: 2000 },
+    { name: 'Jul', uv: 2780 },
+  ];
 
   return (
     <div className='p-6'>
@@ -201,7 +234,7 @@ const JournalManagement: React.FC = () => {
       <Table
         className='mt-4'
         columns={columns}
-        dataSource={data}
+        dataSource={questions}
         pagination={false}
       />
 
@@ -232,6 +265,13 @@ const JournalManagement: React.FC = () => {
           </Form.Item>
           <Form.Item name='required' valuePropName='checked'>
             <Checkbox>Required</Checkbox>
+          </Form.Item>
+          <Form.Item
+            name='isPre'
+            label='Pre-Question'
+            valuePropName='checked'
+          >
+            <Switch />
           </Form.Item>
           <Form.Item>
             <Button type='primary' htmlType='submit'>
@@ -278,9 +318,7 @@ const JournalManagement: React.FC = () => {
             </LineChart>
           </div>
           <div>
-            <h3 className='text-lg font-semibold mb-2'>
-              Journaling Performance
-            </h3>
+            <h3 className='text-lg font-semibold mb-2'>Journaling Performance</h3>
             <BarChart
               width={500}
               height={300}
@@ -298,7 +336,7 @@ const JournalManagement: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default JournalManagement
+export default JournalManagement;
