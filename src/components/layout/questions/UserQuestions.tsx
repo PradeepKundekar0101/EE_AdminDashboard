@@ -40,7 +40,7 @@ interface Question {
   created: string;
   status: string;
   isPre: boolean;
-  required: boolean;
+  isRequired: boolean;
 }
 
 const JournalManagement: React.FC = () => {
@@ -52,6 +52,7 @@ const JournalManagement: React.FC = () => {
   const [form] = Form.useForm();
 
   const token = localStorage.getItem('token');
+  console.log('token: ', token);
 
   useEffect(() => {
     fetchQuestions();
@@ -73,7 +74,7 @@ const JournalManagement: React.FC = () => {
           created: new Date(q.createdAt).toDateString(),
           status: q.status ? 'Active' : 'Inactive',
           isPre: q.isPre,
-          required: q.isRequired,
+          isRequired: q.isRequired,
         }));
         setQuestions(fetchedQuestions);
       } else {
@@ -263,7 +264,7 @@ const JournalManagement: React.FC = () => {
               <Option value='Selection'>Selection</Option>
             </Select>
           </Form.Item>
-          <Form.Item name='required' valuePropName='checked'>
+          <Form.Item name='isRequired' valuePropName='checked'>
             <Checkbox>Required</Checkbox>
           </Form.Item>
           <Form.Item
