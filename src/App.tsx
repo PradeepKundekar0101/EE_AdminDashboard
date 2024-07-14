@@ -9,7 +9,6 @@ import "@fontsource/roboto/700.css"; // Bold weight
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "./redux/hooks";
 
-
 const App = () => {
   const {user,token} = useAppSelector((state)=>{
     return state.auth
