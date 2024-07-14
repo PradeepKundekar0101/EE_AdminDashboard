@@ -8,6 +8,9 @@ import FormLayout from '../../components/layout/form-layout/FormLayout';
 import FormImg from '../../assets/images/form-img.png';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAppDispatch } from '../../redux/hooks';
+import { login } from '../../redux/slices/authSlice';
+import { IUser } from '../../types/data';
 
 interface IFormInput {
   email: string;
@@ -34,14 +37,18 @@ const MentorLogin: React.FC = () => {
   });
 
   const navigate = useNavigate();
-
+  const dispatch = useAppDispatch();
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/mentor/login`, data);
       if (response.data.success) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        localStorage.setItem('token', response.data.token);
-        navigate('/mentor-profile');
+        const {user,token} = response.data;
+        const {firstName,lastName,email,phoneNumber,role} = user;
+        const userObject:IUser ={
+            firstName,lastName,email,phoneNumber,role
+        }
+        dispatch(login({user:userObject,token}))
+        navigate('/mentor');
       } else {
         message.error(response.data.message || 'Login failed');
       }
@@ -99,7 +106,7 @@ const MentorLogin: React.FC = () => {
             htmlType='button'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
           >
-            <Link to='/admin-login'>Admin Login</Link> 
+            <Link to='/login/admin'>Admin Login</Link> 
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>

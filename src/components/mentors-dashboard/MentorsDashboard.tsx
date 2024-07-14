@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button, Tag } from 'antd'
-import { CloudDownloadOutlined } from '@ant-design/icons'
+import { CloudDownloadOutlined, UserAddOutlined } from '@ant-design/icons'
 import MentorsTable from '../mentors-table/MentorsTable'
 import { Mentor } from '../mentors-table/MentorsTable'
 import { Flex } from 'antd' // Assuming you have a Flex component from Ant Design
+import { useNavigate } from 'react-router-dom'
 
 const BASE_URL = import.meta.env.VITE_BASE_URL
 
@@ -12,7 +13,7 @@ const MentorsDashboard: React.FC = () => {
   const [mentors, setMentors] = useState<Mentor[]>([])
   const [totalMentors, setTotalMentors] = useState(0)
   const token = localStorage.getItem('token')
-
+  const navigate = useNavigate();
   useEffect(() => {
     axios
       .get(`${BASE_URL}/user`, {
@@ -40,9 +41,15 @@ const MentorsDashboard: React.FC = () => {
           </p>
           <p className='text-light-grey'>List of all mentors </p>
         </div>
+        <div className='flex space-x-2'>
+        <Button onClick={()=>{navigate("/admin/create-mentor")}} type='default' icon={<UserAddOutlined />}>
+          Create Mentor
+        </Button>
         <Button type='default' icon={<CloudDownloadOutlined />}>
           Export
         </Button>
+
+        </div>
       </Flex>
       </div>
      

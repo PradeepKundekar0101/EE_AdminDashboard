@@ -5,9 +5,12 @@ import * as yup from 'yup';
 import { Input, Form as AntdForm, message } from 'antd';
 import CustomButton from '../../components/ui/button/Button';
 import FormLayout from '../../components/layout/form-layout/FormLayout';
-import FormImg from '../../assets/images/form-img.png';
+import FormImg from '../../assets/images/adminlogin.jpg';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { IUser } from '../../types/data';
+import { useAppDispatch } from '../../redux/hooks';
+import { login } from '../../redux/slices/authSlice';
 
 interface IFormInput {
   email: string;
@@ -34,14 +37,18 @@ const AdminLogin: React.FC = () => {
   });
 
   const navigate = useNavigate();
-
+  const dispatch = useAppDispatch();
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/login`, data);
       if (response.data.success) {
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        localStorage.setItem('token', response.data.token);
-        navigate('/user-profile');
+        const {user,token} = response.data;
+        const {firstName,lastName,email,phoneNumber,role} = user;
+        const userObject:IUser ={
+            firstName,lastName,email,phoneNumber,role
+        }
+      dispatch(login({user:userObject,token}))
+        navigate('/admin');
       } else {
         message.error(response.data.message || 'Login failed');
       }
@@ -101,7 +108,7 @@ const AdminLogin: React.FC = () => {
             htmlType='button'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
           >
-            <Link to='/mentor-login'> Mentor Login</Link>
+            <Link to='/login/mentor'> Mentor Login</Link>
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>
