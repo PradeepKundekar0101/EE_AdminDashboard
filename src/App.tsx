@@ -8,12 +8,9 @@ import "@fontsource/roboto/500.css"; // Medium weight
 import "@fontsource/roboto/700.css"; // Bold weight
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "./redux/hooks";
-import { Suspense } from "react";
-import CustomLayout from "./components/layout/custom-layout/CustomLayout";
-import {Spin} from "antd"
+
 
 const App = () => {
-
   const {user,token} = useAppSelector((state)=>{
     return state.auth
   })
@@ -25,10 +22,7 @@ const App = () => {
   if(user?.role==="admin")
     return <Navigate to={"/admin"}/>
   return (
-    // <Suspense fallback={<CustomLayout> <Spin/>  </CustomLayout>}>
-        
       <Outlet />
-    // </Suspense>
   );
 };
 
