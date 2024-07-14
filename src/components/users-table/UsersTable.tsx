@@ -2,26 +2,20 @@ import React from 'react';
 import { Table, Button, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useAppSelector } from '../../redux/hooks';
+import { IUser } from '../../types/data';
 
-export interface User {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  updatedAt: string;
-  isEmailVerified: boolean;
-  phoneNumber: number;
-}
+
 
 interface UsersTableProps {
-    users: User[];
+    users: IUser[];
+    isLoading:boolean
 }
 
-const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+const UsersTable: React.FC<UsersTableProps> = ({ users,isLoading }) => {
   const {user} = useAppSelector((state)=>{
     return state.auth
   })
-  const columns: ColumnsType<User> = [
+  const columns: ColumnsType<IUser> = [
     {
       title: 'User',
       dataIndex: 'firstName',
@@ -34,7 +28,6 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
         dataIndex: 'phoneNumber',
         key: 'phoneNumber',
         render: (_, record) => `${record.phoneNumber}`,
-        // sorter: (a, b) => Number(a.phoneNumber) - Number(b.phoneNumber),
       },
     {
       title: 'Email',
@@ -42,29 +35,22 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
       key: 'email',
       sorter: (a, b) => a.email.localeCompare(b.email),
     },
-    // {
-    //   title: 'Students',
-    //   dataIndex: 'students',
-    //   key: 'students',
-    //   sorter: (a, b) => a.students - b.students,
-    // },
     {
-      title: 'Login',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      render: (date) => new Date(date).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+      title: 'Occupation',
+      dataIndex: 'occupation',
+      key: 'occupation',
+      sorter: (a, b) => a.occupation!.localeCompare(b.occupation!),
     },
     {
-      title: 'Account Status',
-      dataIndex: 'isEmailVerified',
-      key: 'isEmailVerified',
-      render: (isEmailVerified) => (
-        <Tag color={isEmailVerified ? 'green' : 'red'}>
-          {isEmailVerified ? 'Active' : 'Inactive'}
+      title: 'Broker Connected',
+      dataIndex: 'isBrokerConnected',
+      key: 'isBrokerConnected',
+      render: (isBrokerConnected) => (
+        <Tag color={isBrokerConnected ? 'green' : 'red'}>
+          {isBrokerConnected ? 'Connected' : 'Not Connected'}
         </Tag>
       ),
-      sorter: (a, b) => Number(a.isEmailVerified) - Number(b.isEmailVerified),
+      sorter: (a, b) => Number(a.isBrokerConnected) - Number(b.isBrokerConnected),
     },
     {
       title: 'Action',
@@ -77,7 +63,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
     },
   ];
 
-  return <Table columns={columns} dataSource={users} rowKey="_id" />;
+  return <Table loading={isLoading} columns={columns} dataSource={users} rowKey="_id" />;
 };
 
 export default UsersTable;

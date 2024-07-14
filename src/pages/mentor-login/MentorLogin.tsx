@@ -43,9 +43,9 @@ const MentorLogin: React.FC = () => {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/mentor/login`, data);
       if (response.data.success) {
         const {user,token} = response.data;
-        const {firstName,lastName,email,phoneNumber,role} = user;
+        const {firstName,lastName,email,phoneNumber,role,_id} = user;
         const userObject:IUser ={
-            firstName,lastName,email,phoneNumber,role
+            firstName,lastName,email,phoneNumber,role,_id
         }
         dispatch(login({user:userObject,token}))
         navigate('/mentor');

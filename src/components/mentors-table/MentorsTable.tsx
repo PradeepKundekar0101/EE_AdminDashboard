@@ -1,25 +1,19 @@
 import React from 'react';
-import { Table, Button, Tag } from 'antd';
+import { Table, Button } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useAppSelector } from '../../redux/hooks';
+import { IUser } from '../../types/data';
 
-export interface Mentor {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  students: number;
-  updatedAt: string;
-  isEmailVerified: boolean;
-}
+
 
 interface MentorsTableProps {
-  mentors: Mentor[];
+  mentors: IUser[];
+  isLoading:boolean
 }
 
-const MentorsTable: React.FC<MentorsTableProps> = ({ mentors }) => {
+const MentorsTable: React.FC<MentorsTableProps> = ({ mentors,isLoading }) => {
   const {user} = useAppSelector((state)=>{return state.auth})
-  const columns: ColumnsType<Mentor> = [
+  const columns: ColumnsType<IUser> = [
     {
       title: 'Mentor',
       dataIndex: 'firstName',
@@ -37,26 +31,26 @@ const MentorsTable: React.FC<MentorsTableProps> = ({ mentors }) => {
       title: 'Students',
       dataIndex: 'students',
       key: 'students',
-      sorter: (a, b) => a.students - b.students,
+      // sorter: (a, b) => a.students - b.students,
     },
-    {
-      title: 'Login',
-      dataIndex: 'updatedAt',
-      key: 'updatedAt',
-      render: (date) => new Date(date).toLocaleDateString(),
-      sorter: (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
-    },
-    {
-      title: 'Account Status',
-      dataIndex: 'isEmailVerified',
-      key: 'isEmailVerified',
-      render: (isEmailVerified) => (
-        <Tag color={isEmailVerified ? 'green' : 'red'}>
-          {isEmailVerified ? 'Active' : 'Inactive'}
-        </Tag>
-      ),
-      sorter: (a, b) => Number(a.isEmailVerified) - Number(b.isEmailVerified),
-    },
+    // {
+    //   title: 'Login',
+    //   dataIndex: 'updatedAt',
+    //   key: 'updatedAt',
+    //   render: (date) => new Date(date).toLocaleDateString(),
+    //   sorter: (a, b) => new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+    // },
+    // {
+    //   title: 'Account Status',
+    //   dataIndex: 'isEmailVerified',
+    //   key: 'isEmailVerified',
+    //   render: (isEmailVerified) => (
+    //     <Tag color={isEmailVerified ? 'green' : 'red'}>
+    //       {isEmailVerified ? 'Active' : 'Inactive'}
+    //     </Tag>
+    //   ),
+    //   sorter: (a, b) => Number(a.isEmailVerified) - Number(b.isEmailVerified),
+    // },
     {
       title: 'Action',
       key: 'action',
@@ -68,7 +62,7 @@ const MentorsTable: React.FC<MentorsTableProps> = ({ mentors }) => {
     },
   ];
 
-  return <Table columns={columns} dataSource={mentors} rowKey="_id" />;
+  return <Table loading={isLoading} columns={columns} dataSource={mentors} rowKey="_id" />;
 };
 
 export default MentorsTable;
