@@ -7,7 +7,7 @@ import * as yup from 'yup'
 import { Input, Form as AntdForm } from 'antd'
 import CustomButton from '../../components/ui/button/Button'
 import FormLayout from '../../components/layout/form-layout/FormLayout'
-import FormImg from '../../assets/images/form-img.png'
+import FormImg from '../../assets/images/creatementor.jpg'
 import { useNavigate } from 'react-router-dom'
 
 

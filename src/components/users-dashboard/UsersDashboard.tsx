@@ -56,10 +56,16 @@ const UsersDashboard: React.FC = () => {
       sorter: (a, b) => a.email.localeCompare(b.email),
     },
     {
+      title: 'Mentor',
+      dataIndex: 'mentor',
+      key: 'mentor',
+      render: () => `Not assigned`,
+    },
+    {
       title: 'Occupation',
       dataIndex: 'occupation',
       key: 'occupation',
-      sorter: (a, b) => a.occupation!.localeCompare(b.occupation!),
+      render: (_, record) => `${!record.occupation?"Couldn't fetch":record.occupation}`,
     },
     {
       title: 'Broker Connected',

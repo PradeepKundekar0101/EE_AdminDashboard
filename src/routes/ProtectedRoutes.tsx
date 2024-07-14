@@ -11,7 +11,6 @@ export const ProtectedRoute = ({ role }: { role: "admin" | "mentor" }) => {
   const dispatch = useAppDispatch();
   const { token, user } = authObject;
   const [isChecking, setIsChecking] = React.useState(true);
-  console.log(authObject)
   React.useEffect(() => {
     if (!token) {
       navigate("/login/admin");
