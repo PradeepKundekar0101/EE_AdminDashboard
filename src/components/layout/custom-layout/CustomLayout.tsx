@@ -1,103 +1,57 @@
-import React, { ReactNode } from 'react'
-import { Layout, Menu } from 'antd'
-import Audio from '../../../assets/images/sidebar/audio.svg'
-import Applications from '../../../assets/images/sidebar/applications.svg'
-import NewProducts from '../../../assets/images/sidebar/new-products.svg'
-import YourTickets from '../../../assets/images/sidebar/your-tickets.svg'
-import Security from '../../../assets/images/sidebar/security.svg'
-import YourFinances from '../../../assets/images/sidebar/your-finances.svg'
-import NearMe from '../../../assets/images/sidebar/near-me.svg'
+import React from 'react'
+import { Button, Layout, Menu } from 'antd'
+import { adminItems, mentorItems } from '../../../utils/menuItems'
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks'
+import { useNavigate, useLocation, Link } from 'react-router-dom'
+import { LogoutOutlined } from '@ant-design/icons'
+import { logout } from '../../../redux/slices/authSlice'
 
 const { Header, Sider, Content } = Layout
 
 interface CustomLayoutProps {
-  children: ReactNode
+  children: React.ReactNode
 }
 
 const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
+  const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const menuItems = user?.role === 'admin' ? adminItems : mentorItems;
+
+  const handleMenuClick = (item: { key: string; path: string }) => {
+    navigate(item.path);
+  };
+
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{ maxHeight: '100vh', minHeight: '100vh',overflow:"hidden" }}>
       <Sider>
         <div className='text-2xl text-white text-center mt-4 mb-8 font-bold'>
           EarningEdge<span className='text-[#637CFF]'>.</span>
         </div>
-        <Menu theme='dark' mode='inline' defaultSelectedKeys={['1']}>
-          <Menu.Item
-            key='1'
-            icon={
-              <div className='h-[24px] w-[24px] grid place-content-center'>
-                <img src={Audio} />
-              </div>
-            }
-            color='red'
-          >
-            Audio devices
-          </Menu.Item>
-          <Menu.Item
-            key='2'
-            icon={
-              <div className='h-[24px] w-[24px] grid place-content-center'>
-                <img src={NearMe} />
-              </div>
-            }
-          >
-            Locations
-          </Menu.Item>
-          <Menu.Item
-            key='3'
-            icon={
-              <div className='h-[24px] w-[24px] grid place-content-center'>
-                <img src={NewProducts} />
-              </div>
-            }
-          >
-            New products
-          </Menu.Item>
-          <Menu.Item
-            key='4'
-            icon={
-              <div className='h-[24px] w-[24px] grid place-content-center'>
-                <img src={Security} />
-              </div>
-            }
-          >
-            Security
-          </Menu.Item>
-          <Menu.Item
-            key='5'
-            icon={
-              <div className='h-[24px] w-[24px] grid place-content-center'>
-                <img src={YourFinances} />
-              </div>
-            }
-          >
-            Your finances
-          </Menu.Item>
-          <Menu.Item
-            key='6'
-            icon={
-              <div className='h-[24px] w-[24px] grid place-content-center'>
-                <img src={YourTickets} />
-              </div>
-            }
-          >
-            Your tickets
-          </Menu.Item>
-          <Menu.Item
-            key='7'
-            icon={
-              <div className='h-[24px] w-[24px] grid place-content-center'>
-                <img src={Applications} />
-              </div>
-            }
-          >
-            Applications
-          </Menu.Item>
+        <Menu 
+          theme='dark' 
+          mode='inline' 
+          selectedKeys={[location.pathname]}
+          onClick={({ key }) => {
+            const item = menuItems.find(item => item.key === key);
+            if (item) handleMenuClick(item);
+          }}
+        >
+          {menuItems.map(item => (
+            <Menu.Item key={item.path} icon={item.icon}>
+              <Link to={item.path}>  {item.label}</Link>
+            </Menu.Item>
+          ))}
         </Menu>
+        <Button onClick={()=>{dispatch(logout())}} icon={<LogoutOutlined/>}  className="absolute bottom-2   bg-transparent border-red-300 text-red-300">
+          Logout
+          </Button>
       </Sider>
+
       <Layout>
         <Header style={{ background: '#fff', padding: 0 }} />
-        <Content style={{ margin: '0 16px' }}>
+        <Content style={{ margin: '0 16px',overflowY:"scroll" }}>
           <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
             {children}
           </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import { useAppSelector } from '../../redux/hooks';
 
 export interface User {
   _id: string;
@@ -17,19 +18,22 @@ interface UsersTableProps {
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
+  const {user} = useAppSelector((state)=>{
+    return state.auth
+  })
   const columns: ColumnsType<User> = [
     {
       title: 'User',
       dataIndex: 'firstName',
       key: 'firstName',
-      render: (text, record) => `${record.firstName} ${record.lastName}`,
+      render: (_, record) => `${record.firstName} ${record.lastName}`,
       sorter: (a, b) => a.firstName.localeCompare(b.firstName),
     },
     {
         title: 'Contact Number',
         dataIndex: 'phoneNumber',
         key: 'phoneNumber',
-        render: (text, record) => `${record.phoneNumber}`,
+        render: (_, record) => `${record.phoneNumber}`,
         // sorter: (a, b) => Number(a.phoneNumber) - Number(b.phoneNumber),
       },
     {
@@ -65,8 +69,8 @@ const UsersTable: React.FC<UsersTableProps> = ({ users }) => {
     {
       title: 'Action',
       key: 'action',
-      render: (text, record) => (
-        <Button type="link" href={`/profile/${record._id}`}>
+      render: (_, record) => (
+        <Button type="link" href={`/${user?.role}/user/${record._id}`}>
           View Profile
         </Button>
       ),

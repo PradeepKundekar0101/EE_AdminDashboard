@@ -10,6 +10,7 @@ const AuthenticatedLayout = () => {
   return (
     <div>
       <Routes>
+        <Route path='' element={<h1>Home</h1>}></Route>
         <Route path='/create-mentor' element={<CreateMentor />} />
         <Route path='/questions' element={<Questions />} />
         <Route path='/user-profile' element={<UserProfile />} />

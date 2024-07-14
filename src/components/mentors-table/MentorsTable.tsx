@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Button, Tag } from 'antd';
 import { ColumnsType } from 'antd/es/table';
+import { useAppSelector } from '../../redux/hooks';
 
 export interface Mentor {
   _id: string;
@@ -17,12 +18,13 @@ interface MentorsTableProps {
 }
 
 const MentorsTable: React.FC<MentorsTableProps> = ({ mentors }) => {
+  const {user} = useAppSelector((state)=>{return state.auth})
   const columns: ColumnsType<Mentor> = [
     {
       title: 'Mentor',
       dataIndex: 'firstName',
       key: 'firstName',
-      render: (text, record) => `${record.firstName} ${record.lastName}`,
+      render: (_, record) => `${record.firstName} ${record.lastName}`,
       sorter: (a, b) => a.firstName.localeCompare(b.firstName),
     },
     {
@@ -58,8 +60,8 @@ const MentorsTable: React.FC<MentorsTableProps> = ({ mentors }) => {
     {
       title: 'Action',
       key: 'action',
-      render: (text, record) => (
-        <Button type="link" href={`/profile/${record._id}`}>
+      render: (_, record) => (
+        <Button type="link" href={`/${user?.role}/user/${record._id}`}>
           View Profile
         </Button>
       ),
