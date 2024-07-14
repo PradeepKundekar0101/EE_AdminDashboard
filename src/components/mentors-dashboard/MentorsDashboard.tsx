@@ -1,33 +1,42 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+
 import { Button, Tag } from 'antd'
 import { CloudDownloadOutlined, UserAddOutlined } from '@ant-design/icons'
 import MentorsTable from '../mentors-table/MentorsTable'
-import { Mentor } from '../mentors-table/MentorsTable'
+
 import { Flex } from 'antd' // Assuming you have a Flex component from Ant Design
 import { useNavigate } from 'react-router-dom'
+import useMentorService from '../../hooks/useMentor'
+import { IUser } from '../../types/data'
 
-const BASE_URL = import.meta.env.VITE_BASE_URL
 
 const MentorsDashboard: React.FC = () => {
-  const [mentors, setMentors] = useState<Mentor[]>([])
+  const {getAllMentors} = useMentorService();
+  const [mentors, setMentors] = useState<IUser[]>([])
   const [totalMentors, setTotalMentors] = useState(0)
-  const token = localStorage.getItem('token')
+  const [isLoading,setIsLoading] = useState(false)
   const navigate = useNavigate();
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }) // Adjust the API endpoint accordingly
-      .then(response => {
-        console.log('response: ', response)
-        setMentors(response.data.data)
-        setTotalMentors(response.data.data.length)
-      })
-      .catch(error => console.error('Error fetching mentors data:', error))
-  }, [token])
+
+  const fetchAllMentors = async()=>{
+    try {
+      setIsLoading(true);
+      const res= await getAllMentors();
+      if(res.status===200){
+        setMentors(res.data.data);
+        setTotalMentors(res.data.data.length);
+      }
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setIsLoading(false);
+    }
+  }
+
+
+  useEffect(()=>{
+    fetchAllMentors();
+  },[])
+
 
   return (
     <div className='p-4'>
@@ -53,7 +62,7 @@ const MentorsDashboard: React.FC = () => {
       </Flex>
       </div>
      
-      <MentorsTable mentors={mentors} />
+      <MentorsTable isLoading={isLoading} mentors={mentors} />
     </div>
   )
 }

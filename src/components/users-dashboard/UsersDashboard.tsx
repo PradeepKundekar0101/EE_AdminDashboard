@@ -1,31 +1,38 @@
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
 import { Button, Tag } from 'antd'
 import { CloudDownloadOutlined } from '@ant-design/icons'
-import { User } from '../users-table/UsersTable'
+
 import { Flex } from 'antd'
 import UsersTable from '../users-table/UsersTable'
+import useUserService from '../../hooks/useUserService'
+import { IUser } from '../../types/data'
 
-const BASE_URL = import.meta.env.VITE_BASE_URL
 
 const UsersDashboard: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([])
-  const [totalUsers, setTotalUsers] = useState(0)
-  const token = localStorage.getItem('token')
+  const {getAllUsers} = useUserService();
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [isLoading,setIsLoading] = useState(false);
 
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }) // Adjust the API endpoint accordingly
-      .then(response => {
-        setUsers(response.data.data)
-        setTotalUsers(response.data.data.length)
-      })
-      .catch(error => console.error('Error fetching users data:', error))
-  }, [token])
+  const fetchAllUser = async()=>{
+    try {
+      setIsLoading(true);
+      const res= await getAllUsers();
+      if(res.status===200){
+        setUsers(res.data.data);
+        setTotalUsers(res.data.data.length);
+      }
+    } catch (error) {
+      console.log(error)
+    }finally{
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(()=>{
+    fetchAllUser();
+  },[])
+
 
   return (
     <div className='p-4'>
@@ -45,7 +52,7 @@ const UsersDashboard: React.FC = () => {
         </Flex>
       </div>
 
-      <UsersTable users={users} />
+      <UsersTable isLoading={isLoading} users={users} />
     </div>
   )
 }

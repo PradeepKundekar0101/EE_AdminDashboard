@@ -1,4 +1,4 @@
-import { Layout, Badge, Avatar, Flex, Button } from 'antd'
+import {  Badge, Avatar, Flex, Button } from 'antd'
 import avatarImg from '../../../assets/images/dashboard/avatar.png'
 import exportIcon from '../../../assets/images/dashboard/Icon.svg'
 
