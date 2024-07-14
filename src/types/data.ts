@@ -8,3 +8,13 @@ export interface IUser{
     occupation?:string;
     isBrokerConnected?:boolean;
 }
+export interface IQuestion{
+    key: string;
+    question: string;
+    type: string;
+    responses: number;
+    created: string;
+    status: string;
+    isPre: boolean;
+    isRequired: boolean;
+}

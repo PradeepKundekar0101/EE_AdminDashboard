@@ -3,9 +3,11 @@ import { Button, Tag } from 'antd'
 import { CloudDownloadOutlined } from '@ant-design/icons'
 
 import { Flex } from 'antd'
-import UsersTable from '../users-table/UsersTable'
+
 import useUserService from '../../hooks/useUserService'
 import { IUser } from '../../types/data'
+import { ColumnsType } from 'antd/es/table'
+import CustomTable from '../common/table/CustomTable'
 
 
 const UsersDashboard: React.FC = () => {
@@ -33,6 +35,54 @@ const UsersDashboard: React.FC = () => {
     fetchAllUser();
   },[])
 
+  const columns: ColumnsType<IUser> = [
+    {
+      title: 'User',
+      dataIndex: 'firstName',
+      key: 'firstName',
+      render: (_:string, record:IUser) => `${record.firstName} ${record.lastName}`,
+      sorter: (a:IUser, b:IUser) => a.firstName.localeCompare(b.firstName),
+    },
+    {
+        title: 'Contact Number',
+        dataIndex: 'phoneNumber',
+        key: 'phoneNumber',
+        render: (_, record) => `${record.phoneNumber}`,
+      },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      sorter: (a, b) => a.email.localeCompare(b.email),
+    },
+    {
+      title: 'Occupation',
+      dataIndex: 'occupation',
+      key: 'occupation',
+      sorter: (a, b) => a.occupation!.localeCompare(b.occupation!),
+    },
+    {
+      title: 'Broker Connected',
+      dataIndex: 'isBrokerConnected',
+      key: 'isBrokerConnected',
+      render: (isBrokerConnected:boolean) => (
+        <Tag color={isBrokerConnected ? 'green' : 'red'}>
+          {isBrokerConnected ? 'Connected' : 'Not Connected'}
+        </Tag>
+      ),
+      sorter: (a, b) => Number(a.isBrokerConnected) - Number(b.isBrokerConnected),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Button type="link" href={`/${record?.role}/user/${record._id}`}>
+          View Profile
+        </Button>
+      ),
+    },
+  ];
+
 
   return (
     <div className='p-4'>
@@ -51,8 +101,7 @@ const UsersDashboard: React.FC = () => {
           </Button>
         </Flex>
       </div>
-
-      <UsersTable isLoading={isLoading} users={users} />
+      <CustomTable totalDocuments={users.length} loading={isLoading} data={users} columns={columns} pageSize={10} />
     </div>
   )
 }
