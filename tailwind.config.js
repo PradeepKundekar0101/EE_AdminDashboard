@@ -12,7 +12,8 @@ export default {
         'slate-blue': '#313957',
         'input-bg': '#F7FBFF',
         'link': '#1E4AE9',
-        'light-grey': '#667085'
+        'light-grey': '#667085',
+        'dark-blue': '#262633'
 
       }
     },

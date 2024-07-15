@@ -7,14 +7,21 @@ import CustomButton from '../../components/ui/button/Button';
 import FormLayout from '../../components/layout/form-layout/FormLayout';
 import FormImg from '../../assets/images/adminlogin.jpg';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { IUser } from '../../types/data';
 import { useAppDispatch } from '../../redux/hooks';
 import { login } from '../../redux/slices/authSlice';
+import usePostData from '../../hooks/usePostData';
 
 interface IFormInput {
   email: string;
   password: string;
+}
+
+interface LoginResponse {
+  success: boolean;
+  message?: string;
+  user?: IUser;
+  token?: string;
 }
 
 const schema = yup
@@ -38,24 +45,34 @@ const AdminLogin: React.FC = () => {
 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/admin/login`, data);
-      if (response.data.success) {
-        const {user,token} = response.data;
-        const {firstName,lastName,email,phoneNumber,role,_id} = user;
-        const userObject:IUser ={
-            firstName,lastName,email,phoneNumber,role,_id
-        }
-      dispatch(login({user:userObject,token}))
+  const { data, loading, error, postData } = usePostData<IFormInput, LoginResponse>('/admin/login');
+
+  const onSubmit: SubmitHandler<IFormInput> = async (formData) => {
+    await postData(formData);
+    if (data?.success) {
+      const { user, token } = data;
+      if (user && token) {
+        const { firstName, lastName, email, phoneNumber, role, _id } = user;
+        const userObject: IUser = {
+          firstName,
+          lastName,
+          email,
+          phoneNumber,
+          role,
+          _id,
+        };
+        dispatch(login({ user: userObject, token }));
         navigate('/admin');
-      } else {
-        message.error(response.data.message || 'Login failed');
       }
-    } catch (error: any) {
-      message.error(error.response?.data?.message || 'An error occurred. Please try again.');
+    } else {
+      message.error(data?.message || 'Login failed');
     }
   };
+
+  if (error) {
+    //@ts-ignore
+    message.error(error.response?.data?.message || 'An error occurred. Please try again.');
+  }
 
   const form = (
     <div className='max-w-sm'>
@@ -69,7 +86,7 @@ const AdminLogin: React.FC = () => {
             name='email'
             control={control}
             render={({ field }) => (
-              <Input {...field} className=' text-black focus:ring-2 focus:ring-blue-500' />
+              <Input {...field} className='text-black focus:ring-2 focus:ring-blue-500' />
             )}
           />
         </AntdForm.Item>
@@ -83,14 +100,12 @@ const AdminLogin: React.FC = () => {
             name='password'
             control={control}
             render={({ field }) => (
-              <Input.Password {...field} className=' text-black focus:ring-2 h-[48px] bg-input-bg rounded-xl  focus:ring-blue-500' />
+              <Input.Password {...field} className='text-black focus:ring-2 h-[48px] bg-input-bg rounded-xl focus:ring-blue-500 py-0' />
             )}
           />
         </AntdForm.Item>
         <AntdForm.Item className='mb-4 text-right'>
-          <Link to='/' className='text-link'>
-            Forgot Password?
-          </Link>
+          <Link to='/' className='text-link'>Forgot Password?</Link>
         </AntdForm.Item>
 
         <AntdForm.Item>
@@ -98,8 +113,10 @@ const AdminLogin: React.FC = () => {
             type='primary'
             htmlType='submit'
             className='w-full text-xl py-5 bg-dark-teal rounded-xl'
+            isLoading={loading}
+            disabled={loading}
           >
-            Sign In
+            {loading ? "" :"Sign In"}
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item>
@@ -107,17 +124,15 @@ const AdminLogin: React.FC = () => {
             type='default'
             htmlType='button'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
+            disabled={loading}
           >
-            <Link to='/login/mentor'> Mentor Login</Link>
+            <Link to='/login/mentor'>Mentor Login</Link>
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>
           <p className='text-slate-blue'>
             Don't you have an account?
-            <Link to='/' className='text-link'>
-              {' '}
-              Sign up{' '}
-            </Link>
+            <Link to='/' className='text-link'>Sign up</Link>
           </p>
         </AntdForm.Item>
       </AntdForm>
