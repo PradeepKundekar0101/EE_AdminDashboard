@@ -7,3 +7,20 @@ body {
   height: 48px;
   border-radius: 12px;
 }
+.journal-uploads-carousel {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.journal-uploads-carousel .slick-prev,
+.journal-uploads-carousel .slick-next {
+  z-index: 1;
+}
+
+.journal-uploads-carousel .slick-prev {
+  left: 10px;
+}
+
+.journal-uploads-carousel .slick-next {
+  right: 10px;
+}
