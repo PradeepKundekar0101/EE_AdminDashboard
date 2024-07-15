@@ -47,7 +47,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
   return (
     <Layout style={{ maxHeight: '100vh', minHeight: '100vh', overflow: "hidden" }}>
-      <Sider>
+      <Sider className='bg-dark-blue' style={{background: '#262633'}}>
         <div className='text-2xl text-white text-center mt-4 mb-8 font-bold'>
           EarningEdge<span className='text-[#637CFF]'>.</span>
         </div>
@@ -59,6 +59,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             const item = menuItems.find((item:any) => item.key === key || (item.children && item.children.some((child:any) => child.key === key)));
             if (item) handleMenuClick(item);
           }}
+          style={{background: '#262633'}}
         >
           {renderMenuItems(menuItems)}
         </Menu>
