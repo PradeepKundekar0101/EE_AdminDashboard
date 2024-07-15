@@ -7,6 +7,7 @@ export interface IUser{
     role?:"mentor"|"admin";
     occupation?:string;
     isBrokerConnected?:boolean;
+    profile_url_image?:string;
 }
 export interface IQuestion{
     key: string;
