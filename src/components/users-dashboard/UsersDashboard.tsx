@@ -8,10 +8,12 @@ import useUserService from '../../hooks/useUserService'
 import { IUser } from '../../types/data'
 import { ColumnsType } from 'antd/es/table'
 import CustomTable from '../common/table/CustomTable'
+import { useAppSelector } from '../../redux/hooks'
 
 
 const UsersDashboard: React.FC = () => {
   const {getAllUsers} = useUserService();
+  const user = useAppSelector((state)=>state.auth.user)
   const [users, setUsers] = useState<IUser[]>([]);
   const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading,setIsLoading] = useState(false);
@@ -59,7 +61,7 @@ const UsersDashboard: React.FC = () => {
       title: 'Mentor',
       dataIndex: 'mentor',
       key: 'mentor',
-      render: () => `Not assigned`,
+      render: (_,record:any) => record.mentor?record.mentor.firstName+" "+record.mentor.lastName:`Not assigned`,
     },
     {
       title: 'Occupation',
@@ -82,7 +84,7 @@ const UsersDashboard: React.FC = () => {
       title: 'Action',
       key: 'action',
       render: (_, record) => (
-        <Button type="link" href={`/${record?.role}/user/${record._id}`}>
+        <Button type="link" href={`/${user?.role}/user/${record._id}`}>
           View Profile
         </Button>
       ),
