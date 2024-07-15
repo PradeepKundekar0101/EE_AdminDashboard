@@ -6,26 +6,30 @@ import NetPLBarGraph from "../../components/graphs/bar-graph/NetPLBarGraph";
 import WinPercentageDonutChart from "../../components/graphs/donut-chart/DonutChart";
 import RecentTradesTable from "../../components/common/table/RecentTrades";
 import CustomCalendar from "../../components/common/calendar/Calendar";
+import { useParams } from "react-router-dom";
+import useFetchData from "../../hooks/useFetchData";
+
+const data = [
+  { title: "Total holding value", value: "4,956", color: "#000" },
+  { title: "Total innvalue", value: "956", color: "#000" },
+  { title: "Total P&L", value: "4,956", color: "green" },
+  { title: "P&L Percentage", value: "4.3%", color: "green" },
+];
 
 const UserProfile = () => {
-  const user = {
-    avatar: "https://example.com/avatar.jpg",
-    name: "PRADEEP KUNDEKAR",
-    label: "Mentor: Naveen",
-    clientId: "ABC123",
-    contact: "7411420401",
-    email: " pradeepkundekar@gmail.com",
-    lastLogin: "40 mins ago",
-  };
-  const data = [
-    { title: "Total holding value", value: "4,956", color: "#000" },
-    { title: "Total innvalue", value: "956", color: "#000" },
-    { title: "Total P&L", value: "4,956", color: "green" },
-    { title: "P&L Percentage", value: "4.3%", color: "green" },
-  ];
+  const { userId } = useParams<{ userId: string }>();
+  const { data:userData, loading, error } = useFetchData(`/user/${userId}`);
+  console.log('userData: ', userData);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
   return (
     <CustomLayout>
-      <ProfileSection user={user} />
+        
+      <ProfileSection 
+      //@ts-ignore
+      user={userData?.data[0]} />
       <Row gutter={16} className="mt-10 px-10">
         {data.map((item, index) => (
           <Col span={6} key={index}>
