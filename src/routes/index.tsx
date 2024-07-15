@@ -2,11 +2,12 @@ import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { ProtectedRoute } from "./ProtectedRoutes";
 import App from "../App";
-import NotAllowed from "../pages/not-allowed/NotAllowed";
-import CreateMentor from "../pages/form/CreateMentor";
+
 import CustomLayout from "../components/layout/custom-layout/CustomLayout";
+import ErrorBoundary from "../components/layout/error/ErrorBoundary";
 
 // Lazy Loading all the pages
+const CreateMentor = lazy(()=>import("../pages/form/CreateMentor"));
 const Mentors = lazy((): any => import("../pages/mentors/Mentors"));
 const NotFound = lazy((): any => import("../pages/not-found"));
 const AllUsers = lazy((): any => import("../pages/all-users/AllUsers"));
@@ -24,9 +25,11 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: (
-      <Suspense fallback={<CustomLayout> </CustomLayout>}>
-        <Outlet />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<CustomLayout> </CustomLayout>}>
+          <Outlet />
+        </Suspense>
+      </ErrorBoundary>
     ),
     children: [
       {
@@ -68,7 +71,7 @@ const router = createBrowserRouter([
       },
       {
         path: "forbidden",
-        element: <NotAllowed />,
+        element: <NotFound />,
       },
       {
         path: "*",

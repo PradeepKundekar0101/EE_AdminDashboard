@@ -26,10 +26,9 @@ const UserProfile = () => {
 
   return (
     <CustomLayout>
-        
       <ProfileSection 
       //@ts-ignore
-      user={userData?.data[0]} />
+      user={userData && userData?.data} />
       <Row gutter={16} className="mt-10 px-10">
         {data.map((item, index) => (
           <Col span={6} key={index}>

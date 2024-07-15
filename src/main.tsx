@@ -6,12 +6,15 @@ import { Provider } from "react-redux";
 import { store } from "./redux/store.ts";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
+import ErrorBoundary from "./components/layout/error/ErrorBoundary.tsx";
 
 let persister = persistStore(store);
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <Provider store={store}>
-    <PersistGate persistor={persister}>
-      <RouterProvider router={router} />
-    </PersistGate>
-  </Provider>
+  <ErrorBoundary>
+    <Provider store={store}>
+      <PersistGate persistor={persister}>
+        <RouterProvider router={router} />
+      </PersistGate>
+    </Provider>
+  </ErrorBoundary>
 );
