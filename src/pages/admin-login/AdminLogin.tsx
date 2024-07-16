@@ -116,7 +116,7 @@ const AdminLogin: React.FC = () => {
             isLoading={loading}
             disabled={loading}
           >
-            {loading ? "" :"Sign In"}
+           Sign In
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item>
