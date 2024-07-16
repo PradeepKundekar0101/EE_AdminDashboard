@@ -49,6 +49,7 @@ const Journal = () => {
   const [showSideDrawer, setShowSideDrawer] = useState(false);
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false);
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const { data, loading:isReviewAdding, error:addReviewError, postData } = usePostData<any,any>(`/review/add/${user?.role}/${selectedJournal?._id}`);
   if (!user) {
     return <Navigate to={"/login"} />;
@@ -57,7 +58,7 @@ const Journal = () => {
     data: journalData,
     loading,
     error,
-  } = useFetchData(`journal/all/${user.role}`);
+  } = useFetchData(`journal/all/${user.role}?searchTerm=${searchTerm}`);
 
   const columns = [
     {
@@ -131,6 +132,12 @@ const Journal = () => {
 
   return (
     <CustomLayout>
+      <Input
+        placeholder="Search..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ width: '25%', marginBottom: '20px' }}
+      />
       <Drawer
         open={showSideDrawer}
         onClose={() => {

@@ -20,6 +20,7 @@ import { IQuestion } from "../../../types/data";
 import CustomTable from "../../common/table/CustomTable";
 import useQuestionsService from "../../../hooks/useQuestion";
 import {  PlusCircleOutlined } from "@ant-design/icons";
+import useAxios from '../../../hooks/useAxios'
 
 const { Option } = Select;
 
@@ -36,6 +37,7 @@ const JournalManagement: React.FC = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [form] = Form.useForm();
+  const axiosInstance = useAxios();
 
   const token = localStorage.getItem("token");
   console.log("token: ", token);
@@ -148,6 +150,18 @@ const JournalManagement: React.FC = () => {
     }
   };
 
+  const toggleStatus = async (key: string) => {
+    try {
+      await axiosInstance.put(`/question/toggle-status/${key}`);
+      message.success("Status toggled successfully");
+      fetchQuestions(); // Refresh the list after toggling status
+    } catch (error) {
+      console.log(error)
+      console.log(axiosInstance)
+      message.error("An error occurred while toggling the status");
+    }
+  };
+
   const columns = [
     {
       title: "Question",
@@ -173,8 +187,12 @@ const JournalManagement: React.FC = () => {
       title: "Status",
       key: "status",
       dataIndex: "status",
-      render: (status: string) => (
-        <Tag color={status === "Active" ? "green" : "red"}>
+      render: (status: string, record:any) => (
+        <Tag
+          color={status === "Active" ? "green" : "red"}
+          onClick={() => toggleStatus(record.key)}
+          className="cursor-pointer"
+        >
           {status.toUpperCase()}
         </Tag>
       ),

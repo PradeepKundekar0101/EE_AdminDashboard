@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import useAxios from './useAxios';
+import useDebounce from './useDebounce';
 import { AxiosError } from 'axios';
 
 interface UseFetchData<T> {
@@ -14,10 +15,17 @@ const useFetchData = <T,>(endpoint: string): UseFetchData<T> => {
   const [error, setError] = useState<AxiosError | null>(null);
   const axiosInstance = useAxios();
 
+  const debouncedEndpoint = useDebounce(endpoint, 500); // Adjust the delay as needed
+
   useEffect(() => {
+    if (!debouncedEndpoint) return;
+
     const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const response = await axiosInstance.get<T>(endpoint);
+        const response = await axiosInstance.get<T>(debouncedEndpoint);
         setData(response.data);
       } catch (err) {
         setError(err as AxiosError);
@@ -27,7 +35,7 @@ const useFetchData = <T,>(endpoint: string): UseFetchData<T> => {
     };
 
     fetchData();
-  }, [endpoint]);
+  }, [debouncedEndpoint]);
 
   return { data, loading, error };
 };
