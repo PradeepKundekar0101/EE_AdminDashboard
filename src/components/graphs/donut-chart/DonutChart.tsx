@@ -1,44 +1,46 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { Card } from 'antd';
+import React from 'react';
+import ReactApexChart from 'react-apexcharts';
 
-const data = [
-  { name: 'Win', value: 80.3 },
-  { name: 'Loss', value: 19.7 },
-];
+interface DonutChartProps {
+  data: number[];
+  labels: string[];
+  title: string;
+  colors: string[];
+}
 
-const COLORS = ['#00b894', '#ff5252'];
+const DonutChart: React.FC<DonutChartProps> = ({ data, labels, title, colors }) => {
+  const options = {
+    chart: {
+      type: 'donut',
+    },
+    labels: labels,
+    colors: colors,
+    title: {
+      text: title,
+      align: 'left',
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: '65%',
+        },
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    legend: {
+      position: 'bottom',
+    },
+  };
 
-const WinPercentageDonutChart = () => {
   return (
-    <Card style={{ padding: '20px' }}>
-      <h3 style={{ textAlign: 'center' }}>Win Percentage</h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={70}
-            outerRadius={100}
-            fill="#8884d8"
-            paddingAngle={5}
-            dataKey="value"
-          >
-            {data.map((_, index) => (
-              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend
-            layout="horizontal"
-            verticalAlign="bottom"
-            align="center"
-            iconType="circle"
-          />
-        </PieChart>
-      </ResponsiveContainer>
-    </Card>
+    <div className="p-4">
+      <ReactApexChart
+      //@ts-ignore
+      options={options} series={data} type="donut" height={350} />
+    </div>
   );
 };
 
-export default WinPercentageDonutChart;
+export default DonutChart;
