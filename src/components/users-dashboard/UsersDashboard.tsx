@@ -93,7 +93,7 @@ const UsersDashboard: React.FC = () => {
 
 
   return (
-    <div className='p-4'>
+    <div className='p-10 bg-white'>
       <h1 className='text-2xl font-bold mb-4'>All USERS</h1>
       <div className='border border-[#EAECF0]'>
         <Flex justify='space-between' align='center' className='px-6 py-6'>

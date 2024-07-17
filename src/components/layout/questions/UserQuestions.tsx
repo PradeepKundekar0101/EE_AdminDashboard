@@ -221,7 +221,7 @@ const JournalManagement: React.FC = () => {
 
 
   return (
-    <div className="p-6">
+    <div className="p-10 bg-white">
       <div className="flex w-full justify-between">
         <h2 className="text-xl font-bold mb-4">Manage Journal Questions</h2>
         <Button
