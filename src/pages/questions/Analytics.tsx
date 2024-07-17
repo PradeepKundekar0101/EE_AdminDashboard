@@ -10,68 +10,62 @@ import {
   Bar,
 } from "recharts";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
-const responseData = [
-  { name: "Apr 10", Entry1: 4000, Entry2: 2400 },
-  { name: "Apr 17", Entry1: 3000, Entry2: 1398 },
-  { name: "Apr 24", Entry1: 2000, Entry2: 9800 },
-  { name: "May 01", Entry1: 2780, Entry2: 3908 },
-  { name: "May 08", Entry1: 1890, Entry2: 4800 },
-  { name: "May 15", Entry1: 2390, Entry2: 3800 },
-  { name: "May 23", Entry1: 3490, Entry2: 4300 },
+import AreaChart from "../../components/graphs/area-chart/AreaChart";
+import BarGraph from "../../components/graphs/bar-graphs/BarGraph";
+
+const responseCountData = [
+  {
+    name: 'Entry 1',
+    data: [40, 46,56, 41, 47, 54, 43, 47,54, 43],
+  },
+  {
+    name: 'Entry 2',
+    data: [20, 26, 36, 21, 27, 34, 23, 27, 34, 23],
+  },
+];
+const responseCountCategories = [
+  '2023-04-30T00:00:00.000Z',
+  '2023-05-01T00:00:00.000Z',
+  '2023-05-02T00:00:00.000Z',
+  '2023-05-03T00:00:00.000Z',
+  // Add more dates here
 ];
 
-const performanceData = [
-  { name: "Jan", uv: 4000 },
-  { name: "Mar", uv: 3000 },
-  { name: "May", uv: 2000 },
-  { name: "Jul", uv: 2780 },
+const journalingPerformanceData = [
+  {
+    name: 'Completed',
+    data: [49, 41, 35, 51, 49, 62],
+  },
+  {
+    name: 'Remaining',
+    data: [51, 59, 65, 49, 51, 38],
+  },
 ];
+const journalingPerformanceCategories = ['Jan', 'Mar', 'May', 'Jul'];
+
 
 const Analytics = () => {
   return (
     <CustomLayout>
-      <div className="mt-8">
+      <div className="mt-8 mx-4 p-6">
         <h2 className="text-xl font-bold mb-4">Analytics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-lg font-semibold mb-2">Response Count</h3>
-            <LineChart
-              width={500}
-              height={300}
-              data={responseData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="Entry1"
-                stroke="#8884d8"
-                activeDot={{ r: 8 }}
-              />
-              <Line type="monotone" dataKey="Entry2" stroke="#82ca9d" />
-            </LineChart>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
+          <div className="border rounded-xl border-slate-200 bg-white">
+
+          <AreaChart 
+            data={responseCountData} 
+            categories={responseCountCategories} 
+            title="Response Count" 
+            colors={['#6366F1', '#34D399']} 
+          />
           </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-2">
-              Journaling Performance
-            </h3>
-            <BarChart
-              width={500}
-              height={300}
-              data={performanceData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="uv" fill="#8884d8" />
-            </BarChart>
+          <div className="border rounded-xl border-slate-200 bg-white">
+            <BarGraph 
+            data={journalingPerformanceData} 
+            categories={journalingPerformanceCategories} 
+            title="Journaling Performance" 
+            colors={['#3B82F6', '#D1D5DB']} 
+          />
           </div>
         </div>
       </div>

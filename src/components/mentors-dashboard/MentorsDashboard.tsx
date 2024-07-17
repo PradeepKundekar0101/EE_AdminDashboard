@@ -198,7 +198,7 @@ const MentorsDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="p-4">
+    <div className="p-10 bg-white">
       {/* SIDE COMPONENT TO DISPLAY TRADER */}
       <Drawer
         open={showTradersDrawer}
