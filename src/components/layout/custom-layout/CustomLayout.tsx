@@ -70,8 +70,8 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
       <Layout>
         <Header style={{ background: '#fff', padding: 0 }} />
-        <Content style={{ margin: '0 16px', overflowY: "scroll" }}>
-          <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+        <Content style={{  overflowY: "scroll" }}>
+          <div style={{ minHeight: 360 }}>
             {children}
           </div>
         </Content>
