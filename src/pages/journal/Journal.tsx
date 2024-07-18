@@ -10,6 +10,7 @@ import {
   Input,
   message,
   Upload,
+  DatePicker
 } from "antd";
 import CustomTable from "../../components/common/table/CustomTable";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
@@ -62,6 +63,8 @@ const Journal = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [reviewStatus, setReviewStatus] = useState("");
   const [journalType, setJournalType] = useState("");
+  const { RangePicker } = DatePicker;
+  const [dateRange, setDateRange] = useState(["", ""]);
   const {
     data,
     loading: isReviewAdding,
@@ -79,12 +82,12 @@ const Journal = () => {
     error,
     fetchData,
   } = useFetchData(
-    `journal/all/${user.role}?searchTerm=${searchTerm}&type=${journalType}&reviewStatus=${reviewStatus}`
+    `journal/all/${user.role}?searchTerm=${searchTerm}&type=${journalType}&reviewStatus=${reviewStatus}&fromDate=${dateRange[0]}&toDate=${dateRange[1]}`
   );
 
   useEffect(() => {
     fetchData();
-  }, [reviewStatus, journalType]);
+  }, [reviewStatus, journalType, dateRange]);
 
   const columns = [
     {
@@ -153,6 +156,13 @@ const Journal = () => {
     }
   };
 
+
+  const onCalendarChange = (dates:any, dateStrings:any) => {
+    // console.log(dates);  
+    // console.log(dateStrings[0]);  
+    setDateRange(dateStrings);
+  };
+
   return (
     <CustomLayout>
       <div className="p-10 bg-white">
@@ -187,6 +197,9 @@ const Journal = () => {
               <option value="true">Reviewed</option>
               <option value="false">Not reviewed</option>
             </select>
+
+            <RangePicker onChange={onCalendarChange}/>
+
           </div>
         </div>
         <Drawer
