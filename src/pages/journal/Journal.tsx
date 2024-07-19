@@ -11,7 +11,7 @@ import {
   message,
   Upload,
   DatePicker,
-  Segmented,
+  
 } from "antd";
 
 import CustomTable from "../../components/common/table/CustomTable";
@@ -78,7 +78,7 @@ const Journal = () => {
   });
 
   const {
-    data,
+    // data,
     loading: isReviewAdding,
     error: addReviewError,
     postData,
@@ -91,12 +91,10 @@ const Journal = () => {
   const {
     data: journalData,
     loading,
-    error,
+    // error,
     fetchData,
   } = useFetchData<any>(
-    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${filters.dateRange[1]}`,
-    false // Set to false to prevent initial fetch
-  );
+    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${filters.dateRange[1]}`);
 
   useEffect(() => {
     fetchData();
@@ -108,7 +106,7 @@ const Journal = () => {
     }));
   };
   const {
-    data: uploadData,
+    // data: uploadData,
     loading: isUploading,
     error: uploadError,
     postData: uploadFiles,
