@@ -55,6 +55,7 @@ const Journal = () => {
     arrows: true,
     speed: 500,
     slidesToShow: 1,
+
     slidesToScroll: 1,
   };
   const [showSideDrawer, setShowSideDrawer] = useState(false);
@@ -65,6 +66,7 @@ const Journal = () => {
   const [journalType, setJournalType] = useState("");
   const { RangePicker } = DatePicker;
   const [dateRange, setDateRange] = useState(["", ""]);
+
   const {
     data,
     loading: isReviewAdding,
@@ -88,6 +90,44 @@ const Journal = () => {
   useEffect(() => {
     fetchData();
   }, [reviewStatus, journalType, dateRange]);
+
+  const {
+    data: uploadData,
+    loading: isUploading,
+    error: uploadError,
+    postData: uploadFiles
+  } = usePostData<any, any>(`/review/upload/${selectedJournal?.reviewId}`)
+
+  const handleUpload = async () => {
+    const formData = new FormData()
+    fileList.forEach(file => {
+      formData.append('files', file)
+    })
+    formData.append('user', selectedJournal?.reviewId)
+    try {
+      await uploadFiles(formData)
+      if (uploadError) {
+        message.error(uploadError.message)
+      } else {
+        message.success('Upload successful')
+        setFileList([])
+      }
+    } catch (error: any) {
+      message.error(error?.message || 'Upload failed')
+    }
+  }
+
+  const uploadProps = {
+    onRemove: (file: any) => {
+      setFileList(fileList.filter(f => f.uid !== file.uid))
+    },
+    beforeUpload: (file: any) => {
+      setFileList([...fileList, file])
+      return false
+    },
+    fileList,
+  }
+
 
   const columns = [
     {
@@ -312,9 +352,12 @@ const Journal = () => {
           </div>
           {selectedJournal && selectedJournal?.review && (
             <div>
-              <Upload>
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload>
+               <Upload {...uploadProps}>
+          <Button icon={<UploadOutlined />}>Select Files</Button>
+        </Upload>
+        <Button onClick={handleUpload} disabled={fileList.length === 0 || isUploading}>
+          {isUploading ? 'Uploading...' : 'Upload'}
+        </Button>
             </div>
           )}
           <Drawer
