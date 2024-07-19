@@ -34,7 +34,7 @@ export const ReviewTypeSelector = ({handleFilterChange}:{handleFilterChange:any}
       },
     ]}
     onChange={(value) =>
-      handleFilterChange("journalType", value.toLowerCase())
+      handleFilterChange("reviewStatus", value.toLowerCase())
     }
   />
   )

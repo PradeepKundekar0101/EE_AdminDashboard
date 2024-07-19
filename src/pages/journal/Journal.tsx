@@ -231,7 +231,7 @@ const Journal = () => {
           />
 
           <div className="flex space-x-3">
-           <JournalTypeSelector handleFilterChange={handleFilterChange}/>
+           <JournalTypeSelector  handleFilterChange={handleFilterChange}/>
            <ReviewTypeSelector handleFilterChange={handleFilterChange}/>  
             <RangePicker
              disabledDate={(current) =>
