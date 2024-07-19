@@ -20,6 +20,7 @@ const MentorLogin = lazy((): any => import("../pages/mentor-login/MentorLogin"))
 const AdminLogin = lazy((): any => import("../pages/admin-login/AdminLogin"));
 const MentorDashboard = lazy((): any => import("../pages/mentor-dashboard/MentorDashboard"));
 const AdminDashboard = lazy((): any => import("../pages/admin-dashboard/AdminDashboard"));
+const CommunityPage = lazy((): any => import("../pages/community"));
 
 const router = createBrowserRouter([
   {
@@ -56,6 +57,7 @@ const router = createBrowserRouter([
           { path: "journals", element: <Journal /> },
           { path: "user/:userId", element: <UserProfile /> },
           { path: "create-mentor", element: <CreateMentor /> },
+          { path: "community", element: <CommunityPage /> },
         ],
       },
       {
