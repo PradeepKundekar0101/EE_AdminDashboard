@@ -8,6 +8,8 @@ import { useParams } from 'react-router-dom'
 import useFetchData from '../../hooks/useFetchData'
 import BarGraph from '../../components/graphs/bar-graph/NewBar'
 import DonutChart from '../../components/graphs/donut-chart/DonutChart'
+import ReactApexChart from 'react-apexcharts'
+import AreaChart from '../../components/graphs/area-chart/AreaChart'
 const donutChartData = [80.3, 19.7];
 const donutChartLabels = ['Win', 'Loss'];
 
@@ -32,6 +34,24 @@ const barGraphCategories = [
   'Yesterday',
   'Today',
 ];
+
+
+const cat = [
+  '01 Jan',
+  '02 Jan',
+  '03 Jan',
+  '04 Jan',
+  '05 Jan',
+  '06 Jan',
+  '07 Jan',
+  '08 Jan',
+  '09 Jan',
+  '10 Jan'
+]
+
+const testdata = [{name:"Rating", data:[2,3,3,5,1,0]}]
+
+
 const UserProfile = () => {
   const { userId } = useParams<{ userId: string }>()
   const { data: userData, loading, error } = useFetchData(`/user/${userId}`)
@@ -77,6 +97,9 @@ const UserProfile = () => {
           />
           </div>
         </Flex>
+        <div className='w-full'>
+          <AreaChart title={'hello'} data={testdata} categories={cat} colors={["cyan"]} />
+          </div>
         <div className='mt-10 px-10'>
           <RecentTradesTable />
         </div>
