@@ -60,6 +60,8 @@ const Journal = () => {
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false)
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [fileList, setFileList] = useState<any[]>([])
+
   const {
     data,
     loading: isReviewAdding,
@@ -74,6 +76,44 @@ const Journal = () => {
     loading,
     error
   } = useFetchData(`journal/all/${user.role}?searchTerm=${searchTerm}`)
+
+  const {
+    data: uploadData,
+    loading: isUploading,
+    error: uploadError,
+    postData: uploadFiles
+  } = usePostData<any, any>(`/review/upload/${selectedJournal?.reviewId}`)
+
+  const handleUpload = async () => {
+    const formData = new FormData()
+    fileList.forEach(file => {
+      formData.append('files', file)
+    })
+    formData.append('user', selectedJournal?.reviewId)
+    try {
+      await uploadFiles(formData)
+      if (uploadError) {
+        message.error(uploadError.message)
+      } else {
+        message.success('Upload successful')
+        setFileList([])
+      }
+    } catch (error: any) {
+      message.error(error?.message || 'Upload failed')
+    }
+  }
+
+  const uploadProps = {
+    onRemove: (file: any) => {
+      setFileList(fileList.filter(f => f.uid !== file.uid))
+    },
+    beforeUpload: (file: any) => {
+      setFileList([...fileList, file])
+      return false
+    },
+    fileList,
+  }
+
 
   const columns = [
     {
@@ -261,9 +301,12 @@ const Journal = () => {
           </div>
           {selectedJournal && selectedJournal?.review && (
             <div>
-              <Upload>
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload>
+               <Upload {...uploadProps}>
+          <Button icon={<UploadOutlined />}>Select Files</Button>
+        </Upload>
+        <Button onClick={handleUpload} disabled={fileList.length === 0 || isUploading}>
+          {isUploading ? 'Uploading...' : 'Upload'}
+        </Button>
             </div>
           )}
           <Drawer
