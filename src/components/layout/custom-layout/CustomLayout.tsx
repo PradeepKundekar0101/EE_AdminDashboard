@@ -1,10 +1,10 @@
-import React from 'react';
-import { Button, Layout, Menu } from 'antd';
-import { adminItems, mentorItems } from '../../../utils/menuItems';
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { LogoutOutlined } from '@ant-design/icons';
-import { logout } from '../../../redux/slices/authSlice';
+import React from "react";
+import { Avatar, Button, Dropdown, Layout, Menu, MenuProps } from "antd";
+import { adminItems, mentorItems } from "../../../utils/menuItems";
+import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
+import { useNavigate, useLocation, Link } from "react-router-dom";
+import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { logout } from "../../../redux/slices/authSlice";
 
 const { Header, Sider, Content } = Layout;
 
@@ -17,7 +17,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const menuItems = user?.role === 'admin' ? adminItems : mentorItems;
+  const menuItems = user?.role === "admin" ? adminItems : mentorItems;
 
   const handleMenuClick = (item: { key: string; path: string }) => {
     navigate(item.path);
@@ -39,41 +39,72 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
       );
     });
   };
-  if(!user){
-    return <div>
-      
-    </div>
+  if (!user) {
+    return <div></div>;
   }
 
+  const items: MenuProps["items"] = [
+    {
+      label: user.firstName + " " + user.lastName,
+      key: "0",
+    },
+    {
+      label: user.email,
+      key: "1",
+    },
+    {
+      label: <button className="text-red-500 font-bold">Logout</button>,
+      key: "3",
+    },
+  ];
+
   return (
-    <Layout style={{ maxHeight: '100vh', minHeight: '100vh', overflow: "hidden" }}>
-      <Sider className='bg-dark-blue' style={{background: '#262633'}}>
-        <div className='text-2xl text-white text-center mt-4 mb-8 font-bold'>
-          EarningEdge<span className='text-[#637CFF]'>.</span>
+    <Layout
+      style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }}
+    >
+      <Sider className="bg-dark-blue" style={{ background: "#262633" }}>
+        <div className="text-2xl text-white text-center mt-4 mb-8 font-bold">
+          EarningEdge<span className="text-[#637CFF]">.</span>
         </div>
-        <Menu 
-          theme='dark' 
-          mode='inline' 
+        <Menu
+          theme="dark"
+          mode="inline"
           selectedKeys={[location.pathname]}
           onClick={({ key }) => {
-            const item = menuItems.find((item:any) => item.key === key || (item.children && item.children.some((child:any) => child.key === key)));
+            const item = menuItems.find(
+              (item: any) =>
+                item.key === key ||
+                (item.children &&
+                  item.children.some((child: any) => child.key === key))
+            );
             if (item) handleMenuClick(item);
           }}
-          style={{background: '#262633'}}
+          style={{ background: "#262633" }}
         >
           {renderMenuItems(menuItems)}
         </Menu>
-        <Button onClick={() => { dispatch(logout()) }} icon={<LogoutOutlined />} className="absolute bottom-2 bg-transparent border-red-300 text-red-300">
+        <Button
+          onClick={() => {
+            dispatch(logout());
+          }}
+          icon={<LogoutOutlined />}
+          className="absolute bottom-2 bg-transparent border-red-300 text-red-300"
+        >
           Logout
         </Button>
       </Sider>
 
       <Layout>
-        <Header style={{ background: '#fff', padding: 0 }} />
-        <Content style={{  overflowY: "scroll" }}>
-          <div style={{ minHeight: 360 }}>
-            {children}
-          </div>
+        <Header
+          className="flex justify-end items-center pr-4"
+          style={{ background: "#fff" }}
+        >
+          <Dropdown menu={{ items }} trigger={["click"]}>
+            <Avatar size={45} icon={<UserOutlined />} />
+          </Dropdown>
+        </Header>
+        <Content style={{ overflowY: "scroll" }}>
+          <div style={{ minHeight: 360 }}>{children}</div>
         </Content>
       </Layout>
     </Layout>
