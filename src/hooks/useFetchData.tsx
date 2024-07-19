@@ -1,22 +1,21 @@
 import { useState, useEffect, useCallback } from "react";
 import useAxios from "./useAxios";
 import { AxiosError } from "axios";
-import debounce from 'lodash/debounce';
 
 interface UseFetchData<T> {
   data: T | null;
   loading: boolean;
   error: AxiosError | null;
-  fetchData: () => void;
+  fetchData: () => Promise<void>;
 }
 
-const useFetchData = <T,>(endpoint: string, initialFetch: boolean = true): UseFetchData<T> => {
+const useFetchData = <T,>(endpoint: string): UseFetchData<T> => {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<AxiosError | null>(null);
   const axiosInstance = useAxios();
 
-  const fetchDataImpl = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -29,25 +28,9 @@ const useFetchData = <T,>(endpoint: string, initialFetch: boolean = true): UseFe
     }
   }, [endpoint, axiosInstance]);
 
-  const debouncedFetchData = useCallback(
-    debounce(() => {
-      fetchDataImpl();
-    }, 500),
-    [fetchDataImpl]
-  );
-
   useEffect(() => {
-    if (initialFetch) {
-      debouncedFetchData();
-    }
-    return () => {
-      debouncedFetchData.cancel();
-    };
-  }, [debouncedFetchData, initialFetch]);
-
-  const fetchData = useCallback(() => {
-    debouncedFetchData();
-  }, [debouncedFetchData]);
+    fetchData();
+  }, [endpoint]); 
 
   return { data, loading, error, fetchData };
 };

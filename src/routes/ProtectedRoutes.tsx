@@ -16,7 +16,7 @@ export const ProtectedRoute = ({ role }: { role: "admin" | "mentor" }) => {
       navigate("/login/admin");
       return;
     }
-    try {
+  try {
       const decodedToken: any = jwtDecode(token);
       if (decodedToken.exp * 1000 < Date.now()) {
         alert("Session Expired, please login again");
