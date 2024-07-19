@@ -20,6 +20,7 @@
     "classnames": "^2.5.1",
     "dayjs": "^1.11.11",
     "jwt-decode": "^4.0.0",
+    "lodash": "^4.17.21",
     "moment": "^2.30.1",
     "react": "^18.3.1",
     "react-apexcharts": "^1.4.1",
@@ -32,6 +33,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.7",
     "@types/node": "^20.14.10",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
