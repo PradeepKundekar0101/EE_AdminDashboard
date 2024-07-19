@@ -13,7 +13,7 @@ const App = () => {
   const {user,token} = useAppSelector((state)=>{
     return state.auth
   })
-  if(!token){
+  if(!token || !user || !user.role){
     return <Navigate to={"/login/mentor"}/>
   }
   if(user?.role==="mentor")

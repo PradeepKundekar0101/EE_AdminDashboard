@@ -10,8 +10,10 @@ import {
   Input,
   message,
   Upload,
-  DatePicker
+  DatePicker,
+  Segmented,
 } from "antd";
+
 import CustomTable from "../../components/common/table/CustomTable";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
 import useFetchData from "../../hooks/useFetchData";
@@ -26,6 +28,9 @@ import * as yup from "yup";
 import usePostData from "../../hooks/usePostData";
 import TextArea from "antd/es/input/TextArea";
 import { UploadOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
+import { JournalTypeSelector } from "../../components/common/journal-type-selector";
+import { ReviewTypeSelector } from "../../components/common/journal-review-selector";
 
 interface IFormInput {
   review: string;
@@ -61,11 +66,16 @@ const Journal = () => {
   const [showSideDrawer, setShowSideDrawer] = useState(false);
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false);
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [reviewStatus, setReviewStatus] = useState("");
-  const [journalType, setJournalType] = useState("");
+
+  const [fileList, setFileList] = useState<any[]>([]);
   const { RangePicker } = DatePicker;
-  const [dateRange, setDateRange] = useState(["", ""]);
+
+  const [filters, setFilters] = useState({
+    searchTerm: "",
+    journalType: "",
+    reviewStatus: "",
+    dateRange: ["", ""],
+  });
 
   const {
     data,
@@ -83,51 +93,56 @@ const Journal = () => {
     loading,
     error,
     fetchData,
-  } = useFetchData(
-    `journal/all/${user.role}?searchTerm=${searchTerm}&type=${journalType}&reviewStatus=${reviewStatus}&fromDate=${dateRange[0]}&toDate=${dateRange[1]}`
+  } = useFetchData<any>(
+    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${filters.dateRange[1]}`,
+    false // Set to false to prevent initial fetch
   );
 
   useEffect(() => {
     fetchData();
-  }, [reviewStatus, journalType, dateRange]);
-
+  }, [filters]);
+  const handleFilterChange = (filterName: string, value: string | string[]) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [filterName]: value,
+    }));
+  };
   const {
     data: uploadData,
     loading: isUploading,
     error: uploadError,
-    postData: uploadFiles
-  } = usePostData<any, any>(`/review/upload/${selectedJournal?.reviewId}`)
+    postData: uploadFiles,
+  } = usePostData<any, any>(`/review/upload/${selectedJournal?.reviewId}`);
 
   const handleUpload = async () => {
-    const formData = new FormData()
-    fileList.forEach(file => {
-      formData.append('files', file)
-    })
-    formData.append('user', selectedJournal?.reviewId)
+    const formData = new FormData();
+    fileList.forEach((file) => {
+      formData.append("files", file);
+    });
+    formData.append("user", selectedJournal?.reviewId);
     try {
-      await uploadFiles(formData)
+      await uploadFiles(formData);
       if (uploadError) {
-        message.error(uploadError.message)
+        message.error(uploadError.message);
       } else {
-        message.success('Upload successful')
-        setFileList([])
+        message.success("Upload successful");
+        setFileList([]);
       }
     } catch (error: any) {
-      message.error(error?.message || 'Upload failed')
+      message.error(error?.message || "Upload failed");
     }
-  }
+  };
 
   const uploadProps = {
     onRemove: (file: any) => {
-      setFileList(fileList.filter(f => f.uid !== file.uid))
+      setFileList(fileList.filter((f) => f.uid !== file.uid));
     },
     beforeUpload: (file: any) => {
-      setFileList([...fileList, file])
-      return false
+      setFileList([...fileList, file]);
+      return false;
     },
     fileList,
-  }
-
+  };
 
   const columns = [
     {
@@ -150,6 +165,13 @@ const Journal = () => {
       title: "Type",
       dataIndex: "type",
       key: "type",
+      render: (text: string) => {
+        return (
+          <Tag color={text == "exit" ? "blue" : "green"}>
+            {!text ? "Couldn't get" : text.toUpperCase()}
+          </Tag>
+        );
+      },
     },
     {
       title: "Submitted",
@@ -196,50 +218,39 @@ const Journal = () => {
     }
   };
 
-
-  const onCalendarChange = (dates:any, dateStrings:any) => {
-    // console.log(dates);  
-    // console.log(dateStrings[0]);  
-    setDateRange(dateStrings);
-  };
-
   return (
     <CustomLayout>
-      <div className="p-10 bg-white">
-        <div className="flex w-full justify-between">
-          <Input
+      <div className="px-10 bg-white">
+        <div className="flex w-full justify-between py-7">
+          <Input.Search
             placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{ width: "25%", marginBottom: "20px" }}
+            value={filters.searchTerm}
+            allowClear
+            onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
+            style={{ width: 200 }}
           />
-          <div className="">
-            {/* Journal type  */}
-            <select
-              className="px-4 py-3 border-2 rounded-xl ml-3 bg-slate-100"
-              onChange={(e) => {
-                setJournalType(e.target.value);
+
+          <div className="flex space-x-3">
+           <JournalTypeSelector handleFilterChange={handleFilterChange}/>
+           <ReviewTypeSelector handleFilterChange={handleFilterChange}/>  
+            <RangePicker
+             disabledDate={(current) =>
+              current && current > moment().endOf("day")
+            }
+              onChange={(_, dateStrings) =>
+                handleFilterChange("dateRange", dateStrings)
+              }
+              ranges={{
+                Today: [dayjs(), dayjs()],
+                Yesterday: [
+                  dayjs().subtract(1, "days"),
+                  dayjs().subtract(1, "days"),
+                ],
+                "Last 7 Days": [dayjs().subtract(7, "days"), dayjs()],
+                "Last 30 Days": [dayjs().subtract(30, "days"), dayjs()],
+
               }}
-            >
-              <option value="">All</option>
-              <option value="entry">Entry</option>
-              <option value="exit">Exit</option>
-            </select>
-
-            {/* Review status  */}
-            <select
-              className="px-4 py-3 border-2 rounded-xl ml-3 bg-slate-100"
-              onChange={(e) => {
-                setReviewStatus(e.target.value);
-              }}
-            >
-              <option value="">All</option>
-              <option value="true">Reviewed</option>
-              <option value="false">Not reviewed</option>
-            </select>
-
-            <RangePicker onChange={onCalendarChange}/>
-
+            />
           </div>
         </div>
         <Drawer
@@ -352,12 +363,15 @@ const Journal = () => {
           </div>
           {selectedJournal && selectedJournal?.review && (
             <div>
-               <Upload {...uploadProps}>
-          <Button icon={<UploadOutlined />}>Select Files</Button>
-        </Upload>
-        <Button onClick={handleUpload} disabled={fileList.length === 0 || isUploading}>
-          {isUploading ? 'Uploading...' : 'Upload'}
-        </Button>
+              <Upload {...uploadProps}>
+                <Button icon={<UploadOutlined />}>Select Files</Button>
+              </Upload>
+              <Button
+                onClick={handleUpload}
+                disabled={fileList.length === 0 || isUploading}
+              >
+                {isUploading ? "Uploading..." : "Upload"}
+              </Button>
             </div>
           )}
           <Drawer
