@@ -42,8 +42,8 @@ const UsersDashboard: React.FC = () => {
       title: 'User',
       dataIndex: 'firstName',
       key: 'firstName',
-      render: (_:string, record:IUser) => `${record.firstName} ${record.lastName}`,
-      sorter: (a:IUser, b:IUser) => a.firstName.localeCompare(b.firstName),
+      render: (_:string, record:IUser) => `${record.firstName ?? "Not Available"} ${record.lastName ?? "Not Available"}`,
+      sorter: (a:IUser, b:IUser) => (a.firstName ?? '').localeCompare(b.firstName ?? ''),
     },
     {
         title: 'Contact Number',
