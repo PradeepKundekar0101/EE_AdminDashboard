@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -24,15 +24,10 @@ interface LoginResponse {
   token?: string;
 }
 
-const schema = yup
-  .object({
-    email: yup.string().email('Invalid email').required('Email is required'),
-    password: yup
-      .string()
-      .required('Password is required')
-      .min(8, 'Password must be at least 8 characters'),
-  })
-  .required();
+const schema = yup.object({
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup.string().required('Password is required').min(8, 'Password must be at least 8 characters'),
+}).required();
 
 const AdminLogin: React.FC = () => {
   const {
@@ -49,30 +44,34 @@ const AdminLogin: React.FC = () => {
 
   const onSubmit: SubmitHandler<IFormInput> = async (formData) => {
     await postData(formData);
+  };
+
+  useEffect(() => {
     if (data?.success) {
       const { user, token } = data;
       if (user && token) {
-        const { firstName, lastName, email, phoneNumber, role, _id } = user;
         const userObject: IUser = {
-          firstName,
-          lastName,
-          email,
-          phoneNumber,
-          role,
-          _id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          role: user.role,
+          _id: user._id,
         };
         dispatch(login({ user: userObject, token }));
         navigate('/admin');
       }
-    } else {
-      message.error(data?.message || 'Login failed');
+    } else if (data) {
+      message.error(data.message || 'Login failed');
     }
-  };
+  }, [data, dispatch, navigate]);
 
-  if (error) {
-    //@ts-ignore
-    message.error(error.response?.data?.message || 'An error occurred. Please try again.');
-  }
+  useEffect(() => {
+    if (error) {
+      //@ts-ignore
+      message.error(error.response?.data?.message || 'An error occurred. Please try again.');
+    }
+  }, [error]);
 
   const form = (
     <div className='max-w-sm'>
@@ -116,7 +115,7 @@ const AdminLogin: React.FC = () => {
             isLoading={loading}
             disabled={loading}
           >
-           Sign In
+            Sign In
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item>
