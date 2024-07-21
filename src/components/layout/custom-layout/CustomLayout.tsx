@@ -5,8 +5,18 @@ import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { logout } from "../../../redux/slices/authSlice";
+import useUpdateData from "../../../hooks/useUpdateData";
 
 const { Header, Sider, Content } = Layout;
+
+interface IFormData {
+  displayName: string;
+  location: string;
+  title: string;
+  aboutMe: string;
+  profile: string;
+};
+
 
 interface CustomLayoutProps {
   children: React.ReactNode;
@@ -20,7 +30,13 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const menuItems = user?.role === "admin" ? adminItems : mentorItems;
 
   // Modal functions
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  // const { data, error, putData } = useUpdateData<IFormData, IFormData>('');
+  const { putData: updateProfile, error: profileError } = useUpdateData<FormData, Partial<IFormData>>('/user/profile-image');
+  const { putData: updateDetails, error: userError } = useUpdateData<Omit<IFormData, 'profile'>, Partial<IFormData>>('/user/update/user-details');
+
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const initialFormData = {
     displayName: user?.firstName + " " + user?.lastName,
     location: user?.location || "",
@@ -34,31 +50,72 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, value, type } = e.target as HTMLInputElement;
+    if (type === 'file') {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        setFormData((prevData) => ({
+          ...prevData,
+          [name]: file,
+        }));
+      }
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   useEffect(() => {
-    const hasChanges = Object.keys(initialFormData).some(
+    const profileChanged = formData.profile instanceof File;
+    const otherDetailsChanged = Object.keys(initialFormData).some(
       (key) =>
-        initialFormData[key as keyof typeof initialFormData] !==
-        formData[key as keyof typeof formData]
+        key !== 'profile' &&
+        initialFormData[key as keyof IFormData] !== formData[key as keyof IFormData]
     );
-    setIsChanged(hasChanges);
-  }, [formData]);
+    setIsChanged(profileChanged || otherDetailsChanged);
+  }, [formData, initialFormData]);
+
 
   const showModal = () => {
     setFormData(initialFormData);
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    //need to call api to save changes made
+const handleOk = async () => {
+  try {
+    let updatedData: Partial<IFormData> = {};
+
+    // Check if profile image has changed
+    if (formData.profile instanceof File) {
+      const profileFormData = new FormData();
+      profileFormData.append('profile', formData.profile);
+      const profileData = await updateProfile(profileFormData);
+      updatedData = { ...updatedData, ...profileData };
+    }
+
+    // Check if other details have changed
+    const detailsChanged = Object.keys(initialFormData).some(key => 
+      key !== 'profile' && initialFormData[key as keyof IFormData] !== formData[key as keyof IFormData]
+    );
+
+    if (detailsChanged) {
+      const { profile, ...detailsData } = formData;
+      const newDetails = await updateDetails(detailsData);
+      updatedData = { ...updatedData, ...newDetails };
+    }
+
+    if (Object.keys(updatedData).length > 0) {
+      // Update your Redux store or local state with the new user data
+      // dispatch(updateUser(updatedData));
+    }
+
     setIsModalOpen(false);
-  };
+  } catch (error) {
+    console.error('Error updating profile:', error);
+  }
+};
 
   const handleCancel = () => {
     setFormData(initialFormData);
@@ -68,6 +125,15 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const handleMenuClick = (item: { key: string; path: string }) => {
     navigate(item.path);
   };
+
+  if (profileError) {
+    //@ts-ignore
+    message.error(profileError.response?.data?.message || 'An error occurred. Please try again.');
+  }
+  if (userError) {
+    //@ts-ignore
+    message.error(userError.response?.data?.message || 'An error occurred. Please try again.');
+  }
 
   const renderMenuItems = (items: any[]) => {
     return items.map((item) => {
