@@ -2,11 +2,7 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-/* .ant-input {
-  background-color:#F7FBFF;
-  height: 48px;
-  border-radius: 12px;
-} */
+
 .journal-uploads-carousel {
   width: 80%;
   margin: 0 auto;
@@ -24,3 +20,8 @@ body {
 .journal-uploads-carousel .slick-next {
   right: 10px;
 }
+/* 
+.ant-segmented-item-selected .ant-segmented-item-label{
+  background: rgb(38, 38, 51);
+  color: #fff;
+} */
