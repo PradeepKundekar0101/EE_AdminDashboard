@@ -1,6 +1,6 @@
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
 import ProfileSection from "../../components/common/avatar-details/AvatarDetails";
-import { Col, DatePicker, Flex, Row } from "antd";
+import { Card, Col, DatePicker, Flex, Row } from "antd";
 import StatsBox from "../../components/common/profile-card/ProfileCard";
 import RecentTradesTable from "../../components/common/table/RecentTrades";
 import CustomCalendar from "../../components/common/calendar/Calendar";
@@ -8,11 +8,12 @@ import { useParams } from "react-router-dom";
 import useFetchData from "../../hooks/useFetchData";
 import BarGraph from "../../components/graphs/bar-graph/NewBar";
 import DonutChart from "../../components/graphs/donut-chart/DonutChart";
+
 // import ReactApexChart from "react-apexcharts";
 import AreaChart from "../../components/graphs/area-chart/AreaChart";
 import moment from "moment";
 // import dayjs from "dayjs";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 const donutChartData = [80.3, 19.7];
 const donutChartLabels = ["Win", "Loss"];
 
@@ -156,6 +157,8 @@ const UserProfile = () => {
               // }}
             />
           </div>
+          <Card>
+
           <AreaChart
             title={"Ratings"}
             data={ratings?.length ? ratings : fallbackData}
@@ -164,10 +167,11 @@ const UserProfile = () => {
               fallbackData.map((item) => item.name)
             }
             colors={["cyan"]}
-          />
+            />
+            </Card>
         </div>
         <div className="mt-10 px-10">
-          <RecentTradesTable />
+          <RecentTradesTable userId={userId!} />
         </div>
         <div className="mt-10 px-10">
           <CustomCalendar />
