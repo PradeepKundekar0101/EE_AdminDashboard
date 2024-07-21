@@ -14,6 +14,7 @@
     "@fontsource/roboto": "^5.0.13",
     "@hookform/resolvers": "^3.6.0",
     "@reduxjs/toolkit": "^2.2.6",
+    "@supabase/supabase-js": "^2.44.4",
     "antd": "^5.18.3",
     "apexcharts": "^3.50.0",
     "axios": "^1.7.2",
