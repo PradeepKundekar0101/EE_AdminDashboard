@@ -56,6 +56,15 @@ const AreaChart: React.FC<AreaChartProps> = ({
         format: 'dd/MM/yy'
       }
     },
+    // fill: {
+    //     type: "gradient",
+    //     gradient: {
+    //       shadeIntensity: 1,
+    //       opacityFrom: 0.9,
+    //       opacityTo: 0.9,
+    //       stops: [0, 60, 100]
+    //     }
+    //   },
     colors: colors,
     title: {
       text: title,
