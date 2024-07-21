@@ -1,73 +1,98 @@
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  BarChart,
-  Bar,
-} from "recharts";
+import React, { useState } from "react";
+import { DatePicker, message } from "antd";
+import moment from "moment";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
 import AreaChart from "../../components/graphs/area-chart/AreaChart";
 import BarGraph from "../../components/graphs/bar-graphs/BarGraph";
+import useFetchData from "../../hooks/useFetchData";
 
-const responseCountData = [
-  {
-    name: 'Entry 1',
-    data: [40, 46,56, 41, 47, 54, 43, 47,54, 43],
-  },
-  {
-    name: 'Entry 2',
-    data: [20, 26, 36, 21, 27, 34, 23, 27, 34, 23],
-  },
-];
-const responseCountCategories = [
-  '2023-04-30T00:00:00.000Z',
-  '2023-05-01T00:00:00.000Z',
-  '2023-05-02T00:00:00.000Z',
-  '2023-05-03T00:00:00.000Z',
-  // Add more dates here
-];
+const { RangePicker } = DatePicker;
 
-const journalingPerformanceData = [
-  {
-    name: 'Completed',
-    data: [49, 41, 35, 51, 49, 62],
-  },
-  {
-    name: 'Remaining',
-    data: [51, 59, 65, 49, 51, 38],
-  },
-];
-const journalingPerformanceCategories = ['Jan', 'Mar', 'May', 'Jul'];
+interface Entry {
+  date: string;
+  entry: number;
+  exit: number;
+}
 
+const Analytics: React.FC = () => {
+  const getFormattedDate = (date: Date): string => date.toISOString().split("T")[0];
 
-const Analytics = () => {
+  const yesterday = moment().subtract(1, "days").toDate();
+  const defaultFromDate = getFormattedDate(yesterday);
+  const defaultToDate = getFormattedDate(new Date());
+
+  const [dateRange, setDateRange] = useState<[string, string]>([defaultFromDate, defaultToDate]);
+
+  const { data: apiResponse, loading, error } = useFetchData<{ status: string; data: Entry[] }>(
+    `/analytics/journalTypeTrend?fromDate=${dateRange[0]}&toDate=${dateRange[1]}`
+  );
+
+  const responseCountData = ( apiResponse?.status === "success" && apiResponse?.data?.length > 0)
+  ? [
+    { name: "Entry", data: apiResponse.data.map(entry => entry.entry) },
+    { name: "Exit", data: apiResponse.data.map(entry => entry.exit) },
+  ]
+  : [];
+  console.log('responseCountData: ', responseCountData);
+
+  const responseCountCategories =apiResponse?.status === "success" 
+    ? apiResponse.data.map(entry => entry.date)
+    : [];
+
+  const journalingPerformanceData = [
+    { name: "Completed", data: [49, 41, 35, 51, 49, 62] },
+    { name: "Remaining", data: [51, 59, 65, 49, 51, 38] },
+  ];
+
+  const journalingPerformanceCategories = ["Jan", "Mar", "May", "Jul"];
+
+  const handleDateChange = (dates: any, dateStrings: [string, string]) => {
+    if (dates) {
+      setDateRange(dateStrings);
+    } else {
+      message.error("Please select both start and end dates.");
+    }
+  };
+
   return (
     <CustomLayout>
       <div className="mt-8 mx-4 p-6">
         <h2 className="text-xl font-bold mb-4">Analytics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 ">
-          <div className="border rounded-xl border-slate-200 bg-white">
-
-          <AreaChart 
-            data={responseCountData} 
-            categories={responseCountCategories} 
-            title="Response Count" 
-            colors={['#6366F1', '#34D399']} 
+        <div className="flex mb-4">
+          <RangePicker
+            onChange={handleDateChange}
+            format="YYYY-MM-DD"
+            disabledDate={current => current && current > moment().endOf("day")}
           />
-          </div>
-          <div className="border rounded-xl border-slate-200 bg-white">
-            <BarGraph 
-            data={journalingPerformanceData} 
-            categories={journalingPerformanceCategories} 
-            title="Journaling Performance" 
-            colors={['#3B82F6', '#D1D5DB']} 
-          />
-          </div>
         </div>
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>Error: {error.message}</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="border rounded-xl border-slate-200 bg-white">
+              {responseCountData.length > 0 ? (
+                <AreaChart
+                  data={responseCountData}
+                  categories={responseCountCategories}
+                  title="Response Count"
+                  colors={["#6366F1", "#34D399"]}
+                />
+              ) : (
+                <p className="p-4">No data available</p>
+              )}
+            </div>
+            <div className="border rounded-xl border-slate-200 bg-white">
+              <BarGraph
+                data={journalingPerformanceData}
+                categories={journalingPerformanceCategories}
+                title="Journaling Performance"
+                colors={["#3B82F6", "#D1D5DB"]}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </CustomLayout>
   );

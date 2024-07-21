@@ -25,25 +25,8 @@ const AreaChart: React.FC<AreaChartProps> = ({
     stroke: {
       curve: 'smooth'
     },
-    series: [
-      {
-        name: 'Series 1',
-        data: [45, 52, 38, 45, 19, 23, 2]
-      }
-    ],
     xaxis: {
-      categories: [
-        '01 Jan',
-        '02 Jan',
-        '03 Jan',
-        '04 Jan',
-        '05 Jan',
-        '06 Jan',
-        '07 Jan',
-        '08 Jan',
-        '09 Jan',
-        '10 Jan'
-      ],
+      categories: categories,
       labels: {
         show: false
       },
@@ -70,7 +53,7 @@ const AreaChart: React.FC<AreaChartProps> = ({
     },
     tooltip: {
       x: {
-        format: 'dd/MM/yy HH:mm'
+        format: 'dd/MM/yy'
       }
     },
     // fill: {
