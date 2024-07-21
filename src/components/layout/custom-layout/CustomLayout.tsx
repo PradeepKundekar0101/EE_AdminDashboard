@@ -1,5 +1,5 @@
-import React from "react";
-import { Avatar, Button, Dropdown, Layout, Menu, MenuProps } from "antd";
+import React, { useEffect, useState } from "react";
+import { Avatar, Button, Dropdown, Layout, Menu, MenuProps, Modal } from "antd";
 import { adminItems, mentorItems } from "../../../utils/menuItems";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -18,6 +18,52 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const menuItems = user?.role === "admin" ? adminItems : mentorItems;
+
+  // Modal functions
+  const [isModalOpen, setIsModalOpen] = useState(true);
+  const initialFormData = {
+    displayName: user?.firstName + " " + user?.lastName,
+    location: user?.location || "",
+    title: user?.title || "",
+    aboutMe: user?.aboutMe || "",
+    profile: user?.profile || "",
+  };
+  const [formData, setFormData] = useState(initialFormData);
+  const [isChanged, setIsChanged] = useState(false);
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  useEffect(() => {
+    const hasChanges = Object.keys(initialFormData).some(
+      (key) =>
+        initialFormData[key as keyof typeof initialFormData] !==
+        formData[key as keyof typeof formData]
+    );
+    setIsChanged(hasChanges);
+  }, [formData]);
+
+  const showModal = () => {
+    setFormData(initialFormData);
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    //need to call api to save changes made
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setFormData(initialFormData);
+    setIsModalOpen(false);
+  };
 
   const handleMenuClick = (item: { key: string; path: string }) => {
     navigate(item.path);
@@ -45,16 +91,24 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
   const items: MenuProps["items"] = [
     {
-      label: user.firstName + " " + user.lastName,
+      label: "Username: " + user.firstName + " " + user.lastName,
       key: "0",
     },
     {
-      label: user.email,
+      label: "Email: " + user.email,
       key: "1",
     },
     {
-      label: <button className="text-red-500 font-bold">Logout</button>,
+      label: (
+        <button className="" onClick={showModal}>
+          Edit profile
+        </button>
+      ),
       key: "3",
+    },
+    {
+      label: <button className="text-red-500 font-bold">Logout</button>,
+      key: "4",
     },
   ];
 
@@ -99,9 +153,80 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
           className="flex justify-end items-center pr-4"
           style={{ background: "#fff" }}
         >
-          <Dropdown menu={{ items }} trigger={["click"]}>
+          <Dropdown
+            menu={{ items }}
+            trigger={["click"]}
+            className="cursor-pointer"
+          >
             <Avatar size={45} icon={<UserOutlined />} />
           </Dropdown>
+
+          <Modal
+            title="Edit your profile"
+            open={isModalOpen}
+            onOk={handleOk}
+            okText="Save changes"
+            onCancel={handleCancel}
+            okButtonProps={{ disabled: !isChanged }}
+          >
+            <hr />
+            <p className="text-xl font-semibold">Public information</p>
+            <div className="p-2 bg-stone-100 rounded-md">
+              <div>
+                <p className="text-base font-semibold">Profile image</p>
+                <img
+                  src="https://t4.ftcdn.net/jpg/02/29/75/83/360_F_229758328_7x8jwCwjtBMmC6rgFzLFhZoEpLobB6L8.jpg"
+                  alt=""
+                  height={150}
+                  width={150}
+                />
+                <input 
+                type="file" 
+                name="profile" 
+                onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <label className="text-base font-semibold">Display name</label>
+                <input
+                  type="text"
+                  name="displayName"
+                  value={formData.displayName}
+                  onChange={handleInputChange}
+                  className="w-full border-2 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="text-base font-semibold">Location</label>
+                <input
+                  type="text"
+                  name="location"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                  className="w-full border-2 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="text-base font-semibold">Title</label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className="w-full border-2 rounded-md"
+                />
+              </div>
+              <div>
+                <label className="text-base font-semibold">About me</label>
+                <textarea
+                  name="aboutMe"
+                  value={formData.aboutMe}
+                  onChange={handleInputChange}
+                  className="w-full border-2 rounded-md"
+                ></textarea>
+              </div>
+            </div>
+          </Modal>
         </Header>
         <Content style={{ overflowY: "scroll" }}>
           <div style={{ minHeight: 360 }}>{children}</div>
