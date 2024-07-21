@@ -1,4 +1,5 @@
 import ReactDOM from "react-dom/client";
+import 'antd/dist/reset.css';
 import router from "./routes/index.tsx";
 import "./index.css";
 import { RouterProvider } from "react-router-dom";
@@ -11,6 +12,7 @@ import { SupabaseProvider } from './context/supaBaseContext.tsx'
 
 let persister = persistStore(store);
 ReactDOM.createRoot(document.getElementById("root")!).render(
+  
   <ErrorBoundary>
     <SupabaseProvider>
       <Provider store={store}>
@@ -20,4 +22,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       </Provider>
     </SupabaseProvider>
   </ErrorBoundary>
+
 );
