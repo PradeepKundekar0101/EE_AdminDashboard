@@ -9,6 +9,7 @@ import useFetchData from "../../hooks/useFetchData";
 import BarGraph from "../../components/graphs/bar-graph/NewBar";
 import DonutChart from "../../components/graphs/donut-chart/DonutChart";
 
+// import ReactApexChart from "react-apexcharts";
 import AreaChart from "../../components/graphs/area-chart/AreaChart";
 import moment from "moment";
 
