@@ -12,15 +12,15 @@ import DonutChart from "../../components/graphs/donut-chart/DonutChart";
 import AreaChart from "../../components/graphs/area-chart/AreaChart";
 import moment from "moment";
 // import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 const donutChartData = [80.3, 19.7];
 const donutChartLabels = ["Win", "Loss"];
 
-const data = [
-  { title: "Total holding value", value: "4,956", color: "#000" },
-  { title: "Total innvalue", value: "956", color: "#000" },
-  { title: "Total P&L", value: "4,956", color: "green" },
-  { title: "P&L Percentage", value: "4.3%", color: "green" },
+const dummyProfileData = [
+  { title: "Total holding value", value: "0", color: "#000" },
+  { title: "Total holdings quantity", value: "0", color: "#000" },
+  { title: "Total P&L", value: "0", color: "green" },
+  { title: "Today's total trade quantity", value: "0%", color: "green" },
 ];
 const barGraphData = [
   {
@@ -52,21 +52,44 @@ const { RangePicker } = DatePicker;
 const UserProfile = () => {
   const [filters, setFilters] = useState<[string, string]>(["", ""]);
   const { userId } = useParams<{ userId: string }>();
-  const { data: userData, loading, error, fetchData } = useFetchData(`/user/${userId}`);
-  console.log("userData: ", userData);
+  const {
+    data: userData,
+    loading,
+    error,
+    fetchData,
+  } = useFetchData(`/user/${userId}`);
+  // console.log("userData: ", userData);
 
   // ?fromDate=${filters[0]}&toDate=${filters[1]}
   // /review/analytics/ratingsTrend/:userId
-  const { data: ratingData } = useFetchData<RatingResponse>(`/analytics/ratingsTrend/${userId}?fromDate=${filters[0]}&toDate=${filters[1]}`);
+  const { data: ratingData } = useFetchData<RatingResponse>(
+    `/analytics/ratingsTrend/${userId}?fromDate=${filters[0]}&toDate=${filters[1]}`
+  );
   // console.log("Rating data: ",ratingData)
+  // /analytics/dashboard/:userId
+  const { data: profileData } = useFetchData(`/analytics/dashboard/${userId}`);
+
+  const transformDataToArray = (data: any) => {
+    if (!data || !data.data) return dummyProfileData;
+    
+    return Object.entries(data.data).map(([key, value]) => ({
+      key: key,
+      value: value,
+      title: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) // This converts camelCase to Title Case
+    }));
+  };
+
+  const dataArray = React.useMemo(() => transformDataToArray(profileData), [profileData]);
   
-  const ratings = ratingData?.data.map(item => ({
+  console.log("profile data: ", profileData);
+
+  const ratings = ratingData?.data.map((item) => ({
     name: item._id,
-    data: [item.averageRating] // Wrap in an array
+    data: [item.averageRating], // Wrap in an array
   }));
   // console.log("Ratings : ",ratings);
   const fallbackData = [{ name: "No Rating", data: [0] }];
-  
+
   const handleFilterChange = (dateStrings: [string, string]) => {
     setFilters(dateStrings);
   };
@@ -74,7 +97,7 @@ const UserProfile = () => {
   useEffect(() => {
     fetchData();
   }, [filters]);
-  
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -86,13 +109,13 @@ const UserProfile = () => {
           user={userData && userData?.data}
         />
         <Row gutter={16} className="mt-10 px-10">
-          {data.map((item, index) => (
+          {dataArray.map((item, index) => (
             <Col span={6} key={index}>
               <StatsBox
                 title={item.title}
                 value={item.value}
                 //@ts-ignore
-                color={item.color}
+                // color={item.color}
               />
             </Col>
           ))}
@@ -121,9 +144,7 @@ const UserProfile = () => {
               disabledDate={(current) =>
                 current && current > moment().endOf("day")
               }
-              onChange={(_, dateStrings) =>
-                handleFilterChange(dateStrings)
-              }
+              onChange={(_, dateStrings) => handleFilterChange(dateStrings)}
               // ranges={{
               //   Today: [dayjs(), dayjs()],
               //   Yesterday: [
@@ -138,7 +159,10 @@ const UserProfile = () => {
           <AreaChart
             title={"Ratings"}
             data={ratings?.length ? ratings : fallbackData}
-            categories={ratings?.map(item => item.name) || fallbackData.map(item => item.name)}
+            categories={
+              ratings?.map((item) => item.name) ||
+              fallbackData.map((item) => item.name)
+            }
             colors={["cyan"]}
           />
         </div>
