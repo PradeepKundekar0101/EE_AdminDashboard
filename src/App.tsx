@@ -1,27 +1,44 @@
-import "./App.css";
-// import axios from "axios";
 
-// Import only specific weights and styles
+
+import "./App.css";
 import "@fontsource/roboto/300.css"; // Light weight
 import "@fontsource/roboto/400.css"; // Regular weight
 import "@fontsource/roboto/500.css"; // Medium weight
 import "@fontsource/roboto/700.css"; // Bold weight
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "./redux/hooks";
+import { ConfigProvider } from "antd";
 
 const App = () => {
-  const {user,token} = useAppSelector((state)=>{
-    return state.auth
-  })
-  if(!token || !user || !user.role){
-    return <Navigate to={"/login/mentor"}/>
+  const { user, token } = useAppSelector((state) => state.auth);
+
+  if (!token || !user || !user.role) {
+    return <Navigate to={"/login/mentor"} />;
   }
-  if(user?.role==="mentor")
-    return <Navigate to={"/mentor"}/>
-  if(user?.role==="admin")
-    return <Navigate to={"/admin"}/>
+
+  const getRedirectPath = () => {
+    if (user?.role === "mentor") return "/mentor";
+    if (user?.role === "admin") return "/admin";
+    return "/";
+  };
+
   return (
-      <Outlet />
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#1890ff', // Primary color for all components
+          borderRadius: 2, // Default border radius for all components
+        },
+        components: {
+          Segmented: {
+            itemActiveBg: "rgba(0, 0, 0)",
+            itemColor: "#000",
+          },
+        },
+      }}
+    >
+      {user && user.role ? <Navigate to={getRedirectPath()} /> : <Outlet />}
+    </ConfigProvider>
   );
 };
 

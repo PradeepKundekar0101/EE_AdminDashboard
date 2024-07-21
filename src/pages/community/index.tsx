@@ -6,8 +6,8 @@ import { useAppSelector } from '../../redux/hooks';
 import CustomLayout from '../../components/layout/custom-layout/CustomLayout';
 
 const { TextArea } = Input;
-const { Title } = Typography;
-const { Header, Content, Sider } = Layout;
+// const { } = Typography;
+const {  Content, Sider } = Layout;
 
 interface Message {
   id: string;
