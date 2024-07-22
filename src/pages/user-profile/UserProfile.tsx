@@ -1,6 +1,15 @@
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
 import ProfileSection from "../../components/common/avatar-details/AvatarDetails";
-import { Card, Col, DatePicker, Flex, Row } from "antd";
+import {
+  Card,
+  Col,
+  DatePicker,
+  Dropdown,
+  Flex,
+  Menu,
+  MenuProps,
+  Row,
+} from "antd";
 import StatsBox from "../../components/common/profile-card/ProfileCard";
 import RecentTradesTable from "../../components/common/table/RecentTrades";
 import CustomCalendar from "../../components/common/calendar/Calendar";
@@ -13,7 +22,8 @@ import DonutChart from "../../components/graphs/donut-chart/DonutChart";
 import AreaChart from "../../components/graphs/area-chart/AreaChart";
 import moment from "moment";
 // import dayjs from "dayjs";
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Button } from "antd/es/radio";
 const donutChartData = [80.3, 19.7];
 const donutChartLabels = ["Win", "Loss"];
 
@@ -23,21 +33,21 @@ const dummyProfileData = [
   { title: "Total P&L", value: "0", color: "green" },
   { title: "Today's total trade quantity", value: "0%", color: "green" },
 ];
-const barGraphData = [
-  {
-    name: "Net P&L",
-    data: [10, -20, 15, 30, -25, 10, -15],
-  },
-];
-const barGraphCategories = [
-  "18 June 2024",
-  "19 June 2024",
-  "20 June 2024",
-  "21 June 2024",
-  "22 June 2024",
-  "Yesterday",
-  "Today",
-];
+// const barGraphData = [
+//   {
+//     name: "Net P&L",
+//     data: [10, -20, 15, 30, -25, 10, -15],
+//   },
+// ];
+// const barGraphCategories = [
+//   "18 June 2024",
+//   "19 June 2024",
+//   "20 June 2024",
+//   "21 June 2024",
+//   "22 June 2024",
+//   "Yesterday",
+//   "Today",
+// ];
 
 interface RatingResponse {
   status: string;
@@ -72,17 +82,22 @@ const UserProfile = () => {
 
   const transformDataToArray = (data: any) => {
     if (!data || !data.data) return dummyProfileData;
-    
+
     return Object.entries(data.data).map(([key, value]) => ({
       key: key,
       value: value,
-      title: key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) // This converts camelCase to Title Case
+      title: key
+        .replace(/([A-Z])/g, " $1")
+        .replace(/^./, (str) => str.toUpperCase()), // This converts camelCase to Title Case
     }));
   };
 
-  const dataArray = React.useMemo(() => transformDataToArray(profileData), [profileData]);
-  
-  console.log("profile data: ", profileData);
+  const dataArray = React.useMemo(
+    () => transformDataToArray(profileData),
+    [profileData]
+  );
+
+  // console.log("profile data: ", profileData);
 
   const ratings = ratingData?.data.map((item) => ({
     name: item._id,
@@ -98,6 +113,137 @@ const UserProfile = () => {
   useEffect(() => {
     fetchData();
   }, [filters]);
+
+  const { data: pnlData } = useFetchData(`/analytics/pnl/single/${userId}`);
+
+  const transformPnlDataToBarGraphFormat = (
+    data: any,
+    timeRange: "7days" | "1month" | "1year"
+  ) => {
+    if (!data || !data.data || !Array.isArray(data.data)) {
+      return {
+        data: [{ name: "Net P&L", data: [] }],
+        categories: [],
+      };
+    }
+
+    // Sort the data by date
+    const sortedData = [...data.data].sort(
+      (a, b) => new Date(a._id).getTime() - new Date(b._id).getTime()
+    );
+
+    const endDate = new Date(); // Today
+    let startDate: Date;
+
+    switch (timeRange) {
+      case "7days":
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - 6); // Last 7 days including today
+        break;
+      case "1month":
+        startDate = new Date(endDate);
+        startDate.setMonth(endDate.getMonth() - 1);
+        break;
+      case "1year":
+        startDate = new Date(endDate);
+        startDate.setFullYear(endDate.getFullYear() - 1);
+        break;
+      default:
+        startDate = new Date(sortedData[0]._id);
+    }
+
+    const pnlValues: number[] = [];
+    const categories: string[] = [];
+
+    // Function to aggregate monthly data
+    const aggregateMonthlyData = () => {
+      const monthlyData: { [key: string]: number } = {};
+      for (const item of sortedData) {
+        const date = new Date(item._id);
+        const monthYear = date.toLocaleString("default", {
+          month: "short",
+          year: "numeric",
+        });
+        monthlyData[monthYear] = (monthlyData[monthYear] || 0) + item.totalPnL;
+      }
+      return monthlyData;
+    };
+
+    if (timeRange === "1year") {
+      const monthlyData = aggregateMonthlyData();
+      for (
+        let d = new Date(startDate);
+        d <= endDate;
+        d.setMonth(d.getMonth() + 1)
+      ) {
+        const monthYear = d.toLocaleString("default", {
+          month: "short",
+          year: "numeric",
+        });
+        pnlValues.push(monthlyData[monthYear] || 0);
+        categories.push(monthYear);
+      }
+    } else {
+      for (
+        let d = new Date(startDate);
+        d <= endDate;
+        d.setDate(d.getDate() + 1)
+      ) {
+        const dateString = d.toISOString().split("T")[0];
+        const dataPoint = sortedData.find((item) => item._id === dateString);
+
+        pnlValues.push(dataPoint ? dataPoint.totalPnL : 0);
+
+        // Format the date for categories
+        let formattedDate;
+        if (timeRange === "7days") {
+          formattedDate = d.toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          });
+        } else {
+          formattedDate = d.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
+        }
+        categories.push(formattedDate);
+      }
+
+      // Replace the last two categories with "Yesterday" and "Today" for 7 days and 1 month
+      if (categories.length >= 2 && timeRange !== "1year") {
+        categories[categories.length - 2] = "Yesterday";
+        categories[categories.length - 1] = "Today";
+      }
+    }
+
+    return {
+      data: [{ name: "Net P&L", data: pnlValues }],
+      categories: categories,
+    };
+  };
+
+  const [timeRange, setTimeRange] = useState<"7days" | "1month" | "1year">(
+    "7days"
+  );
+  const timeRangeItems: MenuProps["items"] = [
+    { key: "7days", label: "Last 7 Days" },
+    { key: "1month", label: "Last Month" },
+    { key: "1year", label: "Last Year" },
+  ];
+
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    setTimeRange(e.key as "7days" | "1month" | "1year");
+  };
+
+  const menu = <Menu onClick={handleMenuClick} items={timeRangeItems} />;
+
+  const { data: barGraphData, categories: barGraphCategories } = useMemo(
+    () => transformPnlDataToBarGraphFormat(pnlData, timeRange),
+    [pnlData, timeRange]
+  );
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -122,11 +268,22 @@ const UserProfile = () => {
           ))}
         </Row>
         <Flex justify="space-between" className="mt-10 px-10">
-          <div className="w-[48%]">
+          <div className="w-[48%] flex flex-col">
+            <div className="flex justify-end">
+              <Dropdown overlay={menu} placement="bottomRight" arrow>
+                <Button>
+                  {timeRange === "7days"
+                    ? "Last 7 Days"
+                    : timeRange === "1month"
+                    ? "Last Month"
+                    : "Last Year"}
+                </Button>
+              </Dropdown>
+            </div>
             <BarGraph
               data={barGraphData}
               categories={barGraphCategories}
-              title=""
+              title="P&L Graph"
               colors={["#34D399", "#F87171"]}
             />
           </div>
@@ -158,17 +315,16 @@ const UserProfile = () => {
             />
           </div>
           <Card>
-
-          <AreaChart
-            title={"Ratings"}
-            data={ratings?.length ? ratings : fallbackData}
-            categories={
-              ratings?.map((item) => item.name) ||
-              fallbackData.map((item) => item.name)
-            }
-            colors={["cyan"]}
+            <AreaChart
+              title={"Ratings"}
+              data={ratings?.length ? ratings : fallbackData}
+              categories={
+                ratings?.map((item) => item.name) ||
+                fallbackData.map((item) => item.name)
+              }
+              colors={["cyan"]}
             />
-            </Card>
+          </Card>
         </div>
         <div className="mt-10 px-10">
           <RecentTradesTable userId={userId!} />
