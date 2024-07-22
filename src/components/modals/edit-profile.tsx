@@ -13,7 +13,6 @@ interface Props {
 
 const EditProfile: React.FC<Props> = ({ isModalOpen, handleOk, handleCancel }) => {
   const { user } = useAppSelector((state) => state.auth);
-  console.log(user)
   const dispatch = useAppDispatch();
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
@@ -60,7 +59,7 @@ const EditProfile: React.FC<Props> = ({ isModalOpen, handleOk, handleCancel }) =
       imageFormData.append('profile', formData.profileImage);
       try {
         const {data} = await updateProfile(imageFormData);
-        dispatch(updateuser({...user,profile_url_image:data.profile_image_url}))
+        dispatch(updateuser({...user,profile_image_url:data.profile_image_url}))
         message.success('Profile image updated successfully');
       } catch (error) {
         message.error('Failed to update profile image');
@@ -91,7 +90,7 @@ const EditProfile: React.FC<Props> = ({ isModalOpen, handleOk, handleCancel }) =
       <div className="p-4">
         <div className="relative w-32 h-32 mx-auto mb-4 border rounded-full p-2">
           <img
-            src={previewImage || user?.profile_url_image || '/avatar.png'}
+            src={previewImage || user?.profile_image_url || '/avatar.png'}
             alt="Profile"
             className="w-full h-full object-cover rounded-full"
           />
