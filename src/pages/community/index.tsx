@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Input, Button, List, Typography, message, Upload } from 'antd';
+import { Layout, Menu, Input, Button, List, message, Upload } from 'antd';
 import { SendOutlined, UploadOutlined, CloseOutlined } from '@ant-design/icons';
 import { useSupabase } from '../../context/supaBaseContext';
 import { useAppSelector } from '../../redux/hooks';
 import CustomLayout from '../../components/layout/custom-layout/CustomLayout';
 
 const { TextArea } = Input;
-// const { } = Typography;
+
 const {  Content, Sider } = Layout;
 
 interface Message {
@@ -84,9 +84,9 @@ const ChatPage: React.FC = () => {
     const newMessage = {
       channel,
       content: inputMessage,
-      senderId: user?._id || 'anonymous', // Allow anonymous user
+      senderId: user?._id || 'anonymous', 
       senderName: user ? `${user.firstName} ${user.lastName}` : 'Anonymous',
-      senderProfile: user?.profile_url_image || '/avatar.png',
+      senderProfile: user?.profile_image_url || '/avatar.png',
       mediaUrl,
     };
 
@@ -101,11 +101,11 @@ const ChatPage: React.FC = () => {
     }
   };
 
-  const handleFileUpload = (info: any) => {
-    const file = info.file.originFileObj;
-    setUploadedFile(file);
-    message.success(`${file.name} ready to upload`);
-  };
+  // const handleFileUpload = (info: any) => {
+  //   const file = info.file.originFileObj;
+  //   setUploadedFile(file);
+  //   message.success(`${file.name} ready to upload`);
+  // };
 
   const handleRemoveFile = () => {
     setUploadedFile(null);

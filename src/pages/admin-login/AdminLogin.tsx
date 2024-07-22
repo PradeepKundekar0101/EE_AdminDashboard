@@ -57,6 +57,7 @@ const AdminLogin: React.FC = () => {
           phoneNumber: user.phoneNumber,
           role: user.role,
           _id: user._id,
+          profile_image_url:user.profile_image_url
         };
         dispatch(login({ user: userObject, token }));
         navigate('/admin');

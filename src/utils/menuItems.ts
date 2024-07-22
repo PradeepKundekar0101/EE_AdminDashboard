@@ -54,6 +54,12 @@ export const adminItems = [
     label: "Commmunity",
     path: "/admin/community",
   },
+  {
+    key: "9",
+    icon: React.createElement(LineChartOutlined),
+    label: "Live Market",
+    path: "/admin/live",
+  },
 ];
 
 

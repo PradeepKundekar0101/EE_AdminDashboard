@@ -13,7 +13,7 @@ const App = () => {
   const { user, token } = useAppSelector((state) => state.auth);
 
   if (!token || !user || !user.role) {
-    return <Navigate to={"/login/mentor"} />;
+    return <Navigate to={"/login"} />;
   }
 
   const getRedirectPath = () => {

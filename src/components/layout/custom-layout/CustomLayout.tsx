@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Avatar, Button, Dropdown, Layout, Menu, MenuProps } from "antd";
+import { Avatar, Dropdown, Layout, Menu, MenuProps } from "antd";
 import { adminItems, mentorItems } from "../../../utils/menuItems";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+
 import { logout } from "../../../redux/slices/authSlice";
 import EditProfile from "../../modals/edit-profile";
 
@@ -79,7 +79,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     {
       label: <button className="text-red-500 font-bold">Logout</button>,
       key: "4",
-      onClick: () => dispatch(logout()),
+      onClick: () => {dispatch(logout());navigate("/login")},
     },
   ];
 
@@ -108,15 +108,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
         >
           {renderMenuItems(menuItems)}
         </Menu>
-        <Button
-          onClick={() => {
-            dispatch(logout());
-          }}
-          icon={<LogoutOutlined />}
-          className="absolute bottom-2 bg-transparent border-red-300 text-red-300"
-        >
-          Logout
-        </Button>
+
       </Sider>
 
       <Layout>
@@ -129,7 +121,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             trigger={["click"]}
             className="cursor-pointer"
           >
-            <Avatar size={40} src={user.profile_url_image || "/avatar.png"}  />
+            <Avatar size={40}  src={user.profile_image_url || "/avatar.png"}  />
           </Dropdown>
         </Header>
         <Content style={{ overflowY: "scroll" }}>

@@ -7,7 +7,7 @@ export interface IUser{
     role?:"mentor"|"admin";
     occupation?:string;
     isBrokerConnected?:boolean;
-    profile_url_image?:string;
+    profile_image_url?:string;
 }
 export interface IQuestion{
     key: string;
@@ -21,8 +21,8 @@ export interface IQuestion{
 }
 
 
-type PositionType = "LONG" | "SHORT" | "CLOSED";
-type ExchangeSegment =
+export type PositionType = "LONG" | "SHORT" | "CLOSED";
+export type ExchangeSegment =
   | "NSE_EQ"
   | "NSE_FNO"
   | "NSE_CURRENCY"
@@ -30,8 +30,8 @@ type ExchangeSegment =
   | "BSE_FNO"
   | "BSE_CURRENCY"
   | "MCX_COMM";
-type ProductType = "CNC" | "INTRADAY" | "MARGIN" | "MTF" | "CO" | "BO";
-type OptionType = "CALL" | "PUT";
+export type ProductType = "CNC" | "INTRADAY" | "MARGIN" | "MTF" | "CO" | "BO";
+export type OptionType = "CALL" | "PUT";
 
 export interface IPosition {
   userId:string;

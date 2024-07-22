@@ -21,6 +21,7 @@ const AdminLogin = lazy((): any => import("../pages/admin-login/AdminLogin"));
 const MentorDashboard = lazy((): any => import("../pages/mentor-dashboard/MentorDashboard"));
 const AdminDashboard = lazy((): any => import("../pages/admin-dashboard/AdminDashboard"));
 const CommunityPage = lazy((): any => import("../pages/community"));
+const LivePage = lazy((): any => import("../pages/live/LivePage"));
 
 const router = createBrowserRouter([
   {
@@ -40,7 +41,7 @@ const router = createBrowserRouter([
       {
         path: "login",
         children: [
-          { path: "", element: <Navigate to={"/admin/login"} /> },
+          { path: "", element: <Navigate to={"/admin"} /> },
           { path: "admin", element: <AdminLogin /> },
           { path: "mentor", element: <MentorLogin /> },
         ],
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
           { path: "user/:userId", element: <UserProfile /> },
           { path: "create-mentor", element: <CreateMentor /> },
           { path: "community", element: <CommunityPage /> },
+          { path: "live", element: <LivePage /> },
         ],
       },
       {

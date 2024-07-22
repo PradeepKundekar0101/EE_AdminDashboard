@@ -215,7 +215,7 @@ const MentorsDashboard: React.FC = () => {
           renderItem={(item) => (
             <List.Item key={item.email}>
               <List.Item.Meta
-                avatar={<Avatar src={item.profile_url_image || avatar} />}
+                avatar={<Avatar src={item.profile_image_url || avatar} />}
                 title={<Link to="/">{item.firstName}</Link>}
                 description={item.email}
               />
@@ -262,7 +262,7 @@ const MentorsDashboard: React.FC = () => {
               setSelectedUser(item);
             }} className=" cursor-pointer hover:bg-slate-100 px-3 " key={item.email}>
               <List.Item.Meta
-                avatar={<Avatar src={item.profile_url_image || avatar} />}
+                avatar={<Avatar src={item.profile_image_url || avatar} />}
                 title={<Link to="/">{ !item.firstName?"Couldn't fetch name": item.firstName+" "+item.lastName}</Link>}
                 description={item.email}
               />
