@@ -7,7 +7,7 @@ interface ProfileSectionProps {
   user: IUser
 }
 const ProfileSection: React.FC<ProfileSectionProps> = ({ user }) => {
-  console.log(user)
+  // console.log(user)
   return (
     <div className='bg-dark-blue relative flex w-full rounded-xl p-6'>
       <Avatar size={198} src={avatarImg} className='mx-8' />
