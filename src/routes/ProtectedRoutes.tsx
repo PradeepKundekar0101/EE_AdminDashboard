@@ -12,7 +12,7 @@ export const ProtectedRoute = ({ role }: { role: "admin" | "mentor" }) => {
   const { token, user } = authObject;
   const [isChecking, setIsChecking] = React.useState(true);
   React.useEffect(() => {
-    if (!token) {
+    if (!token || !user) {
       navigate("/login/admin");
       return;
     }
@@ -22,8 +22,13 @@ export const ProtectedRoute = ({ role }: { role: "admin" | "mentor" }) => {
         alert("Session Expired, please login again");
         dispatch(logout());
         navigate("/login");
-      } else if (user?.role !== role) {
-        navigate("/forbidden");
+      } else if(!user.role){
+        navigate("/login");
+        dispatch(logout());
+        
+      } 
+      else if (user?.role !== role) {
+        navigate("/"+user?.role);
       }
     } catch (error) {
       console.log(error);
