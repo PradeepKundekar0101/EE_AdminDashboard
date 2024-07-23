@@ -26,7 +26,7 @@ const CustomCalendar: React.FC<CalendarProps> = ({ userId }) => {
   const [entries, setEntries] = useState<Entry[]>([]);
 
   const { data: apiResponse, loading, error } = useFetchData<{ status: string; data: Entry[] }>(
-    `/journal/singleUser/669174fcd1b67cec4e72596d?date=${selectedValue.format('YYYY-MM-DD')}`
+    `/journal/singleUser/${userId}?date=${selectedValue.format('YYYY-MM-DD')}`
   );
 
   useEffect(() => {
