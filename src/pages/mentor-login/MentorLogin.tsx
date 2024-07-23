@@ -11,6 +11,7 @@ import { useAppDispatch } from '../../redux/hooks';
 import { login } from '../../redux/slices/authSlice';
 import { IUser } from '../../types/data';
 import usePostData from '../../hooks/usePostData';
+import {useNavigationFunctions } from "../../components/navigation/navigationFunctions";
 
 interface IFormInput {
   email: string;
@@ -41,6 +42,7 @@ const MentorLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data, loading, error, postData } = usePostData<IFormInput, LoginResponse>('/mentor/login');
+  const {navigateToAdminLogin} = useNavigationFunctions();
 
   const onSubmit: SubmitHandler<IFormInput> = async (formData) => {
     await postData(formData);
@@ -86,7 +88,7 @@ const MentorLogin: React.FC = () => {
             name='email'
             control={control}
             render={({ field }) => (
-              <Input {...field} className='text-black focus:ring-2 focus:ring-blue-500' />
+              <Input {...field} className='text-black focus:ring-2 h-[36px] focus:ring-blue-500' />
             )}
           />
         </AntdForm.Item>
@@ -100,7 +102,7 @@ const MentorLogin: React.FC = () => {
             name='password'
             control={control}
             render={({ field }) => (
-              <Input.Password {...field} className='text-black focus:ring-2 h-[48px] bg-input-bg rounded-xl focus:ring-blue-500 py-0' />
+              <Input.Password {...field} className='text-black focus:ring-2 h-[36px] focus:ring-blue-500 py-0' />
             )}
           />
         </AntdForm.Item>
@@ -125,8 +127,10 @@ const MentorLogin: React.FC = () => {
             htmlType='button'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
             disabled={loading}
+            onClick={navigateToAdminLogin}
           >
-            <Link to='/login/admin'>Admin Login</Link>
+            Admin
+            {/* <Link to='/login/admin'>Admin Login</Link> */}
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>
