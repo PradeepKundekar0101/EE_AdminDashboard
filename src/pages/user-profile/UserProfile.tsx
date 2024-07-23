@@ -150,7 +150,7 @@ const UserProfile = () => {
           <RecentTradesTable userId={userId!} />
         </div>
         <div className="mt-10 px-10">
-          <CustomCalendar />
+          <CustomCalendar userId={userId || ''} />
         </div>
       </div>
     </CustomLayout>
