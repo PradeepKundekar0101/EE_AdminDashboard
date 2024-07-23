@@ -11,6 +11,7 @@ import { IUser } from '../../types/data';
 import { useAppDispatch } from '../../redux/hooks';
 import { login } from '../../redux/slices/authSlice';
 import usePostData from '../../hooks/usePostData';
+import { useNavigationFunctions } from '../../components/navigation/navigationFunctions';
 
 interface IFormInput {
   email: string;
@@ -41,10 +42,12 @@ const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { data, loading, error, postData } = usePostData<IFormInput, LoginResponse>('/admin/login');
+  const {navigateToMentorLogin} = useNavigationFunctions();
 
   const onSubmit: SubmitHandler<IFormInput> = async (formData) => {
     await postData(formData);
   };
+
 
   useEffect(() => {
     if (data?.success) {
@@ -86,7 +89,7 @@ const AdminLogin: React.FC = () => {
             name='email'
             control={control}
             render={({ field }) => (
-              <Input {...field} className='text-black focus:ring-2 focus:ring-blue-500' />
+              <Input {...field} className='text-black focus:ring-2 h-[36px] focus:ring-blue-500 py-0' />
             )}
           />
         </AntdForm.Item>
@@ -100,7 +103,7 @@ const AdminLogin: React.FC = () => {
             name='password'
             control={control}
             render={({ field }) => (
-              <Input.Password {...field} className='text-black focus:ring-2 h-[48px] bg-input-bg rounded-xl focus:ring-blue-500 py-0' />
+              <Input.Password {...field} className='text-black focus:ring-2 h-[36px] focus:ring-blue-500 py-0' />
             )}
           />
         </AntdForm.Item>
@@ -121,12 +124,13 @@ const AdminLogin: React.FC = () => {
         </AntdForm.Item>
         <AntdForm.Item>
           <CustomButton
-            type='default'
+            type='link'
             htmlType='button'
             className='w-full text-xl py-5 rounded-xl text-black border border-dark-teal'
             disabled={loading}
+            onClick={navigateToMentorLogin}
           >
-            <Link to='/login/mentor'>Mentor Login</Link>
+            Mentor Login
           </CustomButton>
         </AntdForm.Item>
         <AntdForm.Item className='text-center'>
