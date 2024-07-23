@@ -57,7 +57,7 @@ const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors }) 
     ...serie,
     data: serie.data.map((value) => (value >= 0 ? value : -value)),
   }));
-  console.log(series)
+  // console.log(series)
 
   return (
     <div className="p-4">
