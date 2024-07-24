@@ -95,10 +95,10 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
       <Sider className="bg-dark-blue" style={{ background: "#262633" }}>
         <div className="text-2xl text-white text-center mt-4 mb-8 font-bold">
           EarningEdge<span className="text-[#637CFF]">.</span>
-        </div> 
+        </div>
         <Menu
           theme="dark"
-          mode="inline" 
+          mode="inline"
           selectedKeys={[location.pathname]}
           onClick={({ key }) => {
             const item = menuItems.find(
