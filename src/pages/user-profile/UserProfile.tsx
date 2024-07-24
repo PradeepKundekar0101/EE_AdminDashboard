@@ -30,7 +30,7 @@ const donutChartLabels = ["Win", "Loss"];
 const dummyProfileData = [
   { title: "Total holding value", value: "0", color: "#000" },
   { title: "Total holdings quantity", value: "0", color: "#000" },
-  { title: "Total P&L", value: "0", color: "green" },
+  { title: "Today's Total P&L", value: "0", color: "green" },
   { title: "Today's total trade quantity", value: "0%", color: "green" },
 ];
 // const barGraphData = [
@@ -245,6 +245,20 @@ const UserProfile = () => {
     [pnlData, timeRange]
   );
 
+  const formatValue = (value: string | number): string => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
+    
+    if (isNaN(numValue)) {
+      return value.toString();
+    }
+    
+    if (Number.isInteger(numValue)) {
+      return numValue.toString();
+    }
+    
+    return numValue.toFixed(2);
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -260,7 +274,7 @@ const UserProfile = () => {
             <Col span={6} key={index}>
               <StatsBox
                 title={item.title}
-                value={item.value}
+                value={formatValue(item.value)}
                 //@ts-ignore
                 // color={item.color}
               />
