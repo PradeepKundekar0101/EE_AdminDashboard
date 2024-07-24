@@ -82,7 +82,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
       onClick: () => {dispatch(logout());navigate("/login")},
     },
   ];
-
+  console.log(user.profile_image_url)
   return (
     <Layout
       style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }}
