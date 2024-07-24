@@ -98,7 +98,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
         </div> 
         <Menu
           theme="dark"
-          mode="inline"
+          mode="inline" 
           selectedKeys={[location.pathname]}
           onClick={({ key }) => {
             const item = menuItems.find(
