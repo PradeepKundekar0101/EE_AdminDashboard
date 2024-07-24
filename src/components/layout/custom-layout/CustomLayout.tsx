@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Avatar, Dropdown, Layout, Menu, MenuProps } from "antd";
+import { Avatar, Dropdown, Layout, Menu, Switch } from "antd";
 import { adminItems, mentorItems } from "../../../utils/menuItems";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-
+import { LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { logout } from "../../../redux/slices/authSlice";
 import EditProfile from "../../modals/edit-profile";
+import { toggleDarkMode } from "../../../redux/slices/themeSlice";
+import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 
 const { Header, Sider, Content } = Layout;
 
@@ -59,7 +61,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     return <div></div>;
   }
 
-  const items: MenuProps["items"] = [
+  const items = [
     {
       label: "Username: " + user.firstName + " " + user.lastName,
       key: "0",
@@ -70,23 +72,26 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     },
     {
       label: (
-        <button className="" onClick={showModal}>
-          Edit profile
+        <button onClick={showModal}>
+          <EditOutlined /> Edit profile
         </button>
       ),
       key: "3",
     },
     {
-      label: <button className="text-red-500 font-bold">Logout</button>,
+      label: (
+        <button className="text-red-500 font-bold" onClick={() => { dispatch(logout()); navigate("/login") }}>
+          <LogoutOutlined /> Logout
+        </button>
+      ),
       key: "4",
-      onClick: () => {dispatch(logout());navigate("/login")},
     },
   ];
-  console.log(user.profile_image_url)
+
+  const darkMode = useAppSelector((state) => state.theme.darkMode);
+
   return (
-    <Layout
-      style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }}
-    >
+    <Layout style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }} className={darkMode ? 'dark' : ''}>
       <Sider className="bg-dark-blue" style={{ background: "#262633" }}>
         <div className="text-2xl text-white text-center mt-4 mb-8 font-bold">
           EarningEdge<span className="text-[#637CFF]">.</span>
@@ -99,8 +104,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             const item = menuItems.find(
               (item: any) =>
                 item.key === key ||
-                (item.children &&
-                  item.children.some((child: any) => child.key === key))
+                (item.children && item.children.some((child: any) => child.key === key))
             );
             if (item) handleMenuClick(item);
           }}
@@ -108,20 +112,18 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
         >
           {renderMenuItems(menuItems)}
         </Menu>
-
       </Sider>
 
       <Layout>
-        <Header
-          className="flex justify-end items-center pr-4"
-          style={{ background: "#fff" }}
-        >
-          <Dropdown
-            menu={{ items }}
-            trigger={["click"]}
-            className="cursor-pointer"
-          >
-            <Avatar size={40}  src={user.profile_image_url || "/avatar.png"}  />
+        <Header className="flex justify-end items-center pr-4 dark:bg-black bg-white">
+          <Switch
+            checkedChildren={<SunOutlined />}
+            unCheckedChildren={<MoonOutlined />}
+            checked={darkMode}
+            onChange={() => dispatch(toggleDarkMode())}
+          />
+          <Dropdown menu={{ items }} trigger={["click"]} className="cursor-pointer">
+            <Avatar size={40} src={user.profile_image_url || "/avatar.png"} />
           </Dropdown>
         </Header>
         <Content style={{ overflowY: "scroll" }}>
