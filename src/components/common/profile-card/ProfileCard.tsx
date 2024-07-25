@@ -10,20 +10,21 @@ interface StatsProps {
 const colorClassMapping = {
   black: 'text-black',
   green: 'text-green-500',
+  white: 'text-white'
 } as const;
 
 const StatsBox = ({ title, value, color }: StatsProps) => {
-  const colorClass = colorClassMapping[color] || 'text-black';
+  const colorClass = colorClassMapping[color] || 'dark:text-white text-black';
   return (
     <Card
       style={{
         textAlign: 'left',
-        backgroundColor: '#fff',
         borderColor: '#d9d9d9',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.09)',
       }}
+      className='dark:bg-dark-blue'
     >
-      <p className='text-sm'>{title}</p>
+      <p className='text-sm dark:text-white'>{title}</p>
       <p className={classNames('text-2xl font-bold', colorClass)}>{value}</p>
     </Card>
   );

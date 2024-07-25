@@ -92,7 +92,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
   return (
     <Layout style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }} className={darkMode ? 'dark' : ''}>
-      <Sider className="bg-dark-blue" style={{ background: "#262633" }}>
+      <Sider className="bg-dark-blue" style={{ background: "#262633",boxShadow: '5px 0 5px -2px rgba(0, 0, 0, 0.5)' }}>
         <div className="text-2xl text-white text-center mt-4 mb-8 font-bold">
           EarningEdge<span className="text-[#637CFF]">.</span>
         </div>
@@ -115,7 +115,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
       </Sider>
 
       <Layout>
-        <Header className="flex justify-end items-center pr-4 dark:bg-black bg-white">
+        <Header className="flex justify-end items-center pr-4 dark:bg-dark-blue bg-white">
           <Switch
             checkedChildren={<SunOutlined />}
             unCheckedChildren={<MoonOutlined />}
@@ -126,7 +126,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             <Avatar size={40} src={user.profile_image_url || "/avatar.png"} />
           </Dropdown>
         </Header>
-        <Content style={{ overflowY: "scroll" }}>
+        <Content style={{ overflowY: "scroll" }} className="bg-white dark:bg-dark-blue dark:text-white">
           <div style={{ minHeight: 360 }}>{children}</div>
         </Content>
       </Layout>
