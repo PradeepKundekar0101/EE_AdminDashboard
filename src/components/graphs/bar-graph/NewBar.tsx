@@ -6,9 +6,10 @@ interface BarGraphProps {
   categories: string[];
   title: string;
   colors: string[];
+  darkMode?: boolean;
 }
 
-const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors }) => {
+const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors, darkMode }) => {
   const options = {
     chart: {
       type: 'bar',
@@ -39,11 +40,20 @@ const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors }) 
     },
     xaxis: {
       categories: categories,
+      labels: {
+        show: true,
+        style: {
+          colors: darkMode ? '#ffffff' : '#000000'
+        }
+      },
     },
     colors: colors,
     title: {
       text: title,
       align: 'left',
+      style: {
+        color: darkMode ? '#fff' : '#000'
+      }
     },
     grid: {
       show: false,
