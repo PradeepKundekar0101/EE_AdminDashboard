@@ -24,8 +24,6 @@ import moment from "moment";
 // import dayjs from "dayjs";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "antd/es/radio";
-const donutChartData = [80.3, 19.7];
-const donutChartLabels = ["Win", "Loss"];
 
 const dummyProfileData = [
   { title: "Total holding value", value: "0", color: "#000" },
@@ -246,18 +244,24 @@ const UserProfile = () => {
   );
 
   const formatValue = (value: string | number): string => {
-    const numValue = typeof value === 'string' ? parseFloat(value) : value;
-    
+    const numValue = typeof value === "string" ? parseFloat(value) : value;
+
     if (isNaN(numValue)) {
       return value.toString();
     }
-    
+
     if (Number.isInteger(numValue)) {
       return numValue.toString();
     }
-    
+
     return numValue.toFixed(2);
   };
+
+
+  const { data: winLossData } = useFetchData(`/analytics/getWinLossRatio/${userId}`);
+  console.log("winLossData", winLossData)
+  const donutChartData = [winLossData.data.winPercentage, winLossData.data.lossPercentage];
+  const donutChartLabels = ["Win", "Loss"];
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -344,7 +348,7 @@ const UserProfile = () => {
           <RecentTradesTable userId={userId!} />
         </div>
         <div className="mt-10 px-10">
-          <CustomCalendar userId={userId || ''} />
+          <CustomCalendar userId={userId || ""} />
         </div>
       </div>
     </CustomLayout>
