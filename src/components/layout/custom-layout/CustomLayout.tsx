@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Avatar, Dropdown, Layout, Menu, Switch } from "antd";
+import { Avatar, ConfigProvider, Dropdown, Layout, Menu, Switch } from "antd";
 import { adminItems, mentorItems } from "../../../utils/menuItems";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
@@ -13,6 +13,29 @@ const { Header, Sider, Content } = Layout;
 
 interface CustomLayoutProps {
   children: React.ReactNode;
+}
+
+const lightTheme = {
+  token: {
+    colorBgBase: '#ffffff',
+    colorText: '#000000',
+    // Add more tokens as needed
+  }
+}
+
+const darkTheme = {
+  token: {
+    colorBgBase: '#262633',
+    colorText: '#ffffff',
+    colorTextPlaceholder: '#ffffff',
+    colorBorder: '#ffffff',
+    fill: '#ffffff',
+    itemActiveBg: '#ffffff',
+    itemColor: '#ffffff',
+    itemHoverBg: '#ffffff',
+    
+    // Add more tokens as needed
+  }
 }
 
 const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
@@ -92,9 +115,12 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
   return (
     <Layout style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }} className={darkMode ? 'dark' : ''}>
+        <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
+
       <Sider className="bg-dark-blue" style={{ background: "#262633",boxShadow: '5px 0 5px -2px rgba(0, 0, 0, 0.5)' }}>
         <div className="text-2xl text-white text-center mt-4 mb-8 font-bold">
           EarningEdge<span className="text-[#637CFF]">.</span>
+
         </div>
         <Menu
           theme="dark"
@@ -136,6 +162,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
         handleOk={handleOk}
         handleCancel={handleCancel}
       />
+      </ConfigProvider>
     </Layout>
   );
 };
