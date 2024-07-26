@@ -36,6 +36,7 @@ export const ReviewTypeSelector = ({handleFilterChange}:{handleFilterChange:any}
     onChange={(value) =>
       handleFilterChange("reviewStatus", value.toLowerCase())
     }
+    className='dark:bg-gray-600 dark:text-black'
   />
   )
 }
