@@ -33,12 +33,12 @@ export const adminItems = [
         path:"/admin/questions",
         icon: React.createElement(SettingOutlined)
       },
-      {
-        key: "6",
-        label: 'Analytics',
-        path:"/admin/questions/analytics",
-        icon: React.createElement(LineChartOutlined),
-      },
+      // {
+      //   key: "6",
+      //   label: 'Analytics',
+      //   path:"/admin/questions/analytics",
+      //   icon: React.createElement(LineChartOutlined),
+      // },
       
     ],
   },

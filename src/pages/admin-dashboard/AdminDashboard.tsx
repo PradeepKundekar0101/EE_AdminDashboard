@@ -1,4 +1,13 @@
-import { Button, Col, DatePicker, Dropdown, Flex, Menu, MenuProps, Row } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Dropdown,
+  Flex,
+  Menu,
+  MenuProps,
+  Row,
+} from "antd";
 import StatsBox from "../../components/common/profile-card/ProfileCard";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
 import DonutChart from "../../components/graphs/donut-chart/DonutChart";
@@ -146,7 +155,9 @@ const AdminDashboard = () => {
   console.log("OPNL = ", overallPnl);
 
   const pnlCategories = overallPnl?.data.data.map((item) => item._id);
-  const pnlData = overallPnl?.data.data.map((item) => Math.round(item.totalPnL * 100) / 100);
+  const pnlData = overallPnl?.data.data.map(
+    (item) => Math.round(item.totalPnL * 100) / 100
+  );
   console.log(pnlData);
 
   const barGraphData = [
@@ -205,7 +216,7 @@ const AdminDashboard = () => {
           </div>
         </Flex>
         <Flex justify="space-between" className="mt-10 px-10">
-          <div className="w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5">
+          <div className="w-[48%] flex flex-col m-5">
             <div className="flex justify-end">
               <RangePicker
                 disabledDate={(current) =>
@@ -214,12 +225,14 @@ const AdminDashboard = () => {
                 onChange={(_, dateStrings) => handleFilterChange(dateStrings)}
               />
             </div>
-            <BarGraph
-              data={barGraphData}
-              categories={pnlCategories}
-              title="Net P&L Graph"
-              colors={["#34D399", "#F87171"]}
-            />
+            <div className="border rounded-xl border-slate-200 bg-white">
+              <BarGraph
+                data={barGraphData}
+                categories={pnlCategories}
+                title="Net P&L Graph"
+                colors={["#34D399", "#F87171"]}
+              />
+            </div>
           </div>
           <div className="w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5">
             <DonutChart

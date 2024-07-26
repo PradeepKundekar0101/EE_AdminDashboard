@@ -104,9 +104,9 @@ const UsersDashboard: React.FC = () => {
             </p>
             <p className='text-light-grey'>List of all users </p>
           </div>
-          <Button type='default' icon={<CloudDownloadOutlined />}>
+          {/* <Button type='default' icon={<CloudDownloadOutlined />}>
             Export
-          </Button>
+          </Button> */}
         </Flex>
       </div>
       <CustomTable totalDocuments={users.length} loading={isLoading} data={users} columns={columns} pageSize={10} />
