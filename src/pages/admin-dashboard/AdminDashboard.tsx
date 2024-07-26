@@ -1,14 +1,25 @@
-import { Col, Dropdown, Flex, Menu, MenuProps, Row } from 'antd'
-import StatsBox from '../../components/common/profile-card/ProfileCard'
-import CustomLayout from '../../components/layout/custom-layout/CustomLayout'
-import DonutChart from '../../components/graphs/donut-chart/DonutChart'
-import BarGraph from '../../components/graphs/bar-graph/NewBar'
-import useFetchData from '../../hooks/useFetchData'
-import { useState } from 'react'
-import moment from 'moment'
-import AreaChart from '../../components/graphs/area-chart/AreaChart'
-import ReactApexChart from 'react-apexcharts'
-import { useAppSelector } from '../../redux/hooks'
+
+import {
+  Button,
+  Col,
+  DatePicker,
+  Dropdown,
+  Flex,
+  Menu,
+  MenuProps,
+  Row,
+} from "antd";
+import StatsBox from "../../components/common/profile-card/ProfileCard";
+import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
+import DonutChart from "../../components/graphs/donut-chart/DonutChart";
+import BarGraph from "../../components/graphs/bar-graph/NewBar";
+import useFetchData from "../../hooks/useFetchData";
+import { useState } from "react";
+import moment from "moment";
+import AreaChart from "../../components/graphs/area-chart/AreaChart";
+import ReactApexChart from "react-apexcharts";
+
+const { RangePicker } = DatePicker;
 
 const dummyProfileData = [
   { title: 'Total holding value', value: '0', color: '#000' },
@@ -16,6 +27,7 @@ const dummyProfileData = [
   { title: "Today's Total P&L ", value: '0', color: 'green' },
   { title: 'P&L Percentage', value: '0%', color: 'green' }
 ]
+
 
 const barGraphData = [
   {
@@ -51,6 +63,72 @@ interface Entry {
 }
 
 
+let state = {
+  series: [76],
+  options: {
+    chart: {
+      type: "radialBar",
+      offsetY: -20,
+    },
+    plotOptions: {
+      radialBar: {
+        startAngle: -90,
+        endAngle: 90,
+        track: {
+          background: "#e7e7e7",
+          strokeWidth: "97%",
+          margin: 5,
+          dropShadow: {
+            enabled: true,
+            top: 2,
+            left: 0,
+            color: "#999",
+            opacity: 1,
+            blur: 2,
+          },
+        },
+        dataLabels: {
+          name: {
+            show: true,
+            color: "#888",
+            fontSize: "15px",
+            offsetY: -25,
+          },
+          value: {
+            show: true,
+            color: "#111",
+            fontSize: "30px",
+            offsetY: -5,
+            formatter: function (val: number) {
+              return val + "%";
+            },
+          },
+        },
+        hollow: {
+          margin: 15,
+          size: "70%",
+        },
+        cornerRadius: 30,
+        lineCap: "round",
+      },
+    },
+    fill: {
+      type: "solid",
+      colors: ["#34D399"],
+    },
+    labels: ["Connected Users"],
+  },
+};
+
+const AdminDashboard = () => {
+  const getFormattedDate = (date: Date): string =>
+    date.toISOString().split("T")[0];
+  const yesterday = moment().subtract(1, "days").toDate();
+  const defaultFromDate = getFormattedDate(yesterday);
+  const defaultToDate = getFormattedDate(new Date());
+  const [filters, setFilters] = useState<[string, string]>(["", ""]);
+
+
 
 // Dummy data for AreaChart
 const dummyAreaChartData = [
@@ -83,10 +161,13 @@ const AdminDashboard = () => {
   const defaultFromDate = getFormattedDate(yesterday)
   const defaultToDate = getFormattedDate(new Date())
 
+
   const [dateRange, setDateRange] = useState<[string, string]>([
     defaultFromDate,
     defaultToDate
   ])
+
+
 
   const {
     data: apiResponse,
@@ -95,7 +176,7 @@ const AdminDashboard = () => {
   } = useFetchData<{ status: string; data: Entry[] }>(
     `/analytics/journalTypeTrend?fromDate=${dateRange[0]}&toDate=${dateRange[1]}`
   )
-  console.log(' journalTypeTrend', apiResponse)
+
 
   const responseCountData =
     apiResponse?.status === 'success' && apiResponse?.data?.length > 0
@@ -110,6 +191,36 @@ const AdminDashboard = () => {
     apiResponse?.status === 'success'
       ? apiResponse.data.map(entry => entry.date)
       : []
+
+
+  const { data: userCountData } = useFetchData<{
+    status: string;
+    data: Entry[];
+  }>(`/analytics/getConnectedUsersRatio`);
+  state.series = [Math.round(userCountData?.data?.connected * 100) / 100];
+
+  const { data: overallPnl } = useFetchData<{
+    status: string;
+    data: Entry[];
+  }>(`/analytics/pnl/overall?fromDate=${filters[0]}&toDate=${filters[1]}`);
+  console.log("OPNL = ", overallPnl);
+
+  const pnlCategories = overallPnl?.data.data.map((item) => item._id);
+  const pnlData = overallPnl?.data.data.map(
+    (item) => Math.round(item.totalPnL * 100) / 100
+  );
+  console.log(pnlData);
+
+  const barGraphData = [
+    {
+      name: "Net P&L",
+      data: pnlData ? pnlData : [],
+    },
+  ];
+
+  const handleFilterChange = (dateStrings: [string, string]) => {
+    setFilters(dateStrings);
+  };
 
   const darkMode = useAppSelector(state => state.theme.darkMode)
 
@@ -172,6 +283,7 @@ const AdminDashboard = () => {
     }
   }
 
+
   return (
     <CustomLayout>
       <div className='p-10'>
@@ -182,15 +294,16 @@ const AdminDashboard = () => {
               <StatsBox
                 title={item.title}
                 value={item.value}
-                // color={dark ? 'white' : 'black'}
-                //@ts-ignore
-                // color={item.color}
+
+                // @ts-ignore
+                color={item.color}
               />
             </Col>
           ))}
         </Row>
         <Flex>
-          <div className='w-[48%] flex flex-col'>
+
+          <div className='w-[48%] flex flex-col w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
             {/* {responseCountData.length > 0 ? ( */}
             <AreaChart
               data={dummyAreaChartData}
@@ -201,10 +314,12 @@ const AdminDashboard = () => {
               darkMode={darkMode}
             />
             {/* ) : (
+
               <p className="p-4">No data available</p>
-            )} */}
+            )}
           </div>
-          <div className='w-[48%] flex flex-col items-center justify-center'>
+
+          <div className='w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
             {/* {responseCountData.length > 0 ? ( */}
             <div className='w-full mt-16'>
               <ReactApexChart
@@ -218,6 +333,7 @@ const AdminDashboard = () => {
             )} */}
           </div>
         </Flex>
+
         <Flex justify='space-between' className='mt-10 px-10'>
           <div className='w-[48%] flex flex-col'>
             <div className='flex justify-end'>
@@ -239,7 +355,8 @@ const AdminDashboard = () => {
               darkMode={darkMode}
             />
           </div>
-          <div className='w-[48%]'>
+          <div className='w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
+
             <DonutChart
               data={donutChartData}
               labels={donutChartLabels}
