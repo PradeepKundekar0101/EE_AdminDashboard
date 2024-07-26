@@ -25,6 +25,11 @@ import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "antd/es/radio";
 
+import { useAppSelector } from "../../redux/hooks";
+const donutChartData = [80.3, 19.7];
+const donutChartLabels = ["Win", "Loss"];
+
+
 const dummyProfileData = [
   { title: "Total holding value", value: "0", color: "#000" },
   { title: "Total holdings quantity", value: "0", color: "#000" },
@@ -256,6 +261,8 @@ const UserProfile = () => {
 
     return numValue.toFixed(2);
   };
+  const darkMode = useAppSelector((state) => state.theme.darkMode);
+
 
 
   const { data: winLossData } = useFetchData(`/analytics/getWinLossRatio/${userId}`);
@@ -268,7 +275,7 @@ const UserProfile = () => {
 
   return (
     <CustomLayout>
-      <div className="p-10 bg-white">
+      <div className="p-10">
         <ProfileSection
           //@ts-ignore
           user={userData && userData?.data}
@@ -280,7 +287,7 @@ const UserProfile = () => {
                 title={item.title}
                 value={formatValue(item.value)}
                 //@ts-ignore
-                // color={item.color}
+                color={item.color}
               />
             </Col>
           ))}
@@ -305,8 +312,9 @@ const UserProfile = () => {
               categories={barGraphCategories}
               title="P&L Graph"
               colors={["#34D399", "#F87171"]}
-              />
-              </div>
+
+              darkMode={darkMode}
+            />
           </div>
           <div className="w-[48%] border rounded-xl border-slate-200 bg-white">
             <DonutChart
@@ -314,6 +322,7 @@ const UserProfile = () => {
               labels={donutChartLabels}
               title="Win Percentage"
               colors={["#34D399", "#F87171"]}
+              darkMode={darkMode}
             />
           </div>
         </Flex>

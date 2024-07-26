@@ -81,3 +81,21 @@ export interface IHoldings {
   avgCostPrice: number;
   userId: string;
 }
+
+export interface Message {
+  id: string;
+  content: string;
+  senderId: string;
+  senderName: string;
+  senderProfile: string;
+  createdAt: string;
+  mediaUrl?: string;
+  conversationId: string;
+}
+
+export interface Conversation {
+  id: string;
+  participants: string[];
+  createdAt: string;
+  updatedAt: string;
+}

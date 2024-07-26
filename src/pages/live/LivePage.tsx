@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSupabase } from "../../context/supaBaseContext";
+import  useSupabase  from "../../hooks/useSupabase";
 import { useAppSelector } from "../../redux/hooks";
 import { Navigate } from "react-router-dom";
 import {

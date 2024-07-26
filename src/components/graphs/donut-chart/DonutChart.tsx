@@ -6,9 +6,10 @@ interface DonutChartProps {
   labels: string[];
   title: string;
   colors: string[];
+  darkMode?: boolean;
 }
 
-const DonutChart: React.FC<DonutChartProps> = ({ data, labels, title, colors }) => {
+const DonutChart: React.FC<DonutChartProps> = ({ data, labels, title, colors, darkMode }) => {
   const options = {
     chart: {
       type: 'donut',
@@ -18,6 +19,9 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, labels, title, colors }) 
     title: {
       text: title,
       align: 'left',
+      style: {
+        color: darkMode ? '#fff' : '#000',
+      }
     },
     plotOptions: {
       pie: {
@@ -31,6 +35,9 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, labels, title, colors }) 
     },
     legend: {
       position: 'bottom',
+      labels : {
+        colors: darkMode ? "#fff" : "000"
+      }
     },
   };
 
