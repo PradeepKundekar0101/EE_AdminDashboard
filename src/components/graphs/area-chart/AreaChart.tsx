@@ -6,7 +6,8 @@ interface AreaChartProps {
   categories: string[]
   title: string
   colors: string[]
-  darkMode?:boolean
+  darkMode?:boolean,
+  style?:any
 }
 
 const AreaChart: React.FC<AreaChartProps> = ({

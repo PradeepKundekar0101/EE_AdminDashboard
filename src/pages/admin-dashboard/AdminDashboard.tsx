@@ -1,25 +1,26 @@
 
 import {
-  Button,
+  // Button,
   Col,
-  DatePicker,
-  Dropdown,
+  // DatePicker,
+  // Dropdown,
   Flex,
-  Menu,
-  MenuProps,
+  // Menu,
+  // MenuProps,
   Row,
 } from "antd";
 import StatsBox from "../../components/common/profile-card/ProfileCard";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
-import DonutChart from "../../components/graphs/donut-chart/DonutChart";
+// import DonutChart from "../../components/graphs/donut-chart/DonutChart";
 import BarGraph from "../../components/graphs/bar-graph/NewBar";
 import useFetchData from "../../hooks/useFetchData";
 import { useState } from "react";
 import moment from "moment";
-import AreaChart from "../../components/graphs/area-chart/AreaChart";
-import ReactApexChart from "react-apexcharts";
+// import AreaChart from "../../components/graphs/area-chart/AreaChart";
+// import ReactApexChart from "react-apexcharts";
+import { useAppSelector } from "../../redux/hooks";
 
-const { RangePicker } = DatePicker;
+// const { RangePicker } = DatePicker;
 
 const dummyProfileData = [
   { title: 'Total holding value', value: '0', color: '#000' },
@@ -45,8 +46,8 @@ const barGraphCategories = [
   'Today'
 ]
 
-const donutChartData = [80.3, 19.7]
-const donutChartLabels = ['Win', 'Loss']
+// const donutChartData = [80.3, 19.7]
+// const donutChartLabels = ['Win', 'Loss']
 
 // const timeRangeItems: MenuProps["items"] = [
 //   { key: "7days", label: "Last 7 Days" },
@@ -63,96 +64,63 @@ interface Entry {
 }
 
 
-let state = {
-  series: [76],
-  options: {
-    chart: {
-      type: "radialBar",
-      offsetY: -20,
-    },
-    plotOptions: {
-      radialBar: {
-        startAngle: -90,
-        endAngle: 90,
-        track: {
-          background: "#e7e7e7",
-          strokeWidth: "97%",
-          margin: 5,
-          dropShadow: {
-            enabled: true,
-            top: 2,
-            left: 0,
-            color: "#999",
-            opacity: 1,
-            blur: 2,
-          },
-        },
-        dataLabels: {
-          name: {
-            show: true,
-            color: "#888",
-            fontSize: "15px",
-            offsetY: -25,
-          },
-          value: {
-            show: true,
-            color: "#111",
-            fontSize: "30px",
-            offsetY: -5,
-            formatter: function (val: number) {
-              return val + "%";
-            },
-          },
-        },
-        hollow: {
-          margin: 15,
-          size: "70%",
-        },
-        cornerRadius: 30,
-        lineCap: "round",
-      },
-    },
-    fill: {
-      type: "solid",
-      colors: ["#34D399"],
-    },
-    labels: ["Connected Users"],
-  },
-};
+// let state = {
+//   series: [76],
+//   options: {
+//     chart: {
+//       type: "radialBar",
+//       offsetY: -20,
+//     },
+//     plotOptions: {
+//       radialBar: {
+//         startAngle: -90,
+//         endAngle: 90,
+//         track: {
+//           background: "#e7e7e7",
+//           strokeWidth: "97%",
+//           margin: 5,
+//           dropShadow: {
+//             enabled: true,
+//             top: 2,
+//             left: 0,
+//             color: "#999",
+//             opacity: 1,
+//             blur: 2,
+//           },
+//         },
+//         dataLabels: {
+//           name: {
+//             show: true,
+//             color: "#888",
+//             fontSize: "15px",
+//             offsetY: -25,
+//           },
+//           value: {
+//             show: true,
+//             color: "#111",
+//             fontSize: "30px",
+//             offsetY: -5,
+//             formatter: function (val: number) {
+//               return val + "%";
+//             },
+//           },
+//         },
+//         hollow: {
+//           margin: 15,
+//           size: "70%",
+//         },
+//         cornerRadius: 30,
+//         lineCap: "round",
+//       },
+//     },
+//     fill: {
+//       type: "solid",
+//       colors: ["#34D399"],
+//     },
+//     labels: ["Connected Users"],
+//   },
+// };
 
-const AdminDashboard = () => {
-  const getFormattedDate = (date: Date): string =>
-    date.toISOString().split("T")[0];
-  const yesterday = moment().subtract(1, "days").toDate();
-  const defaultFromDate = getFormattedDate(yesterday);
-  const defaultToDate = getFormattedDate(new Date());
-  const [filters, setFilters] = useState<[string, string]>(["", ""]);
-
-
-
-// Dummy data for AreaChart
-const dummyAreaChartData = [
-  {
-    name: 'Entry',
-    data: [30, 40, 35, 50, 49, 60, 70, 91, 125]
-  },
-  {
-    name: 'Exit',
-    data: [20, 35, 40, 45, 55, 65, 75, 80, 100]
-  }
-]
-
-const dummyAreaChartCategories = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep'
-]
 
 const AdminDashboard = () => {
   const getFormattedDate = (date: Date): string =>
@@ -162,7 +130,7 @@ const AdminDashboard = () => {
   const defaultToDate = getFormattedDate(new Date())
 
 
-  const [dateRange, setDateRange] = useState<[string, string]>([
+  const [dateRange] = useState<[string, string]>([
     defaultFromDate,
     defaultToDate
   ])
@@ -171,8 +139,8 @@ const AdminDashboard = () => {
 
   const {
     data: apiResponse,
-    loading,
-    error
+    // loading,
+    // error
   } = useFetchData<{ status: string; data: Entry[] }>(
     `/analytics/journalTypeTrend?fromDate=${dateRange[0]}&toDate=${dateRange[1]}`
   )
@@ -193,95 +161,95 @@ const AdminDashboard = () => {
       : []
 
 
-  const { data: userCountData } = useFetchData<{
-    status: string;
-    data: Entry[];
-  }>(`/analytics/getConnectedUsersRatio`);
-  state.series = [Math.round(userCountData?.data?.connected * 100) / 100];
+  // const { data: userCountData } = useFetchData<{
+  //   status: string;
+  //   data: Entry[];
+  // }>(`/analytics/getConnectedUsersRatio`);
+  // state.series = [Math.round(userCountData?.data?.connected * 100) / 100];
 
-  const { data: overallPnl } = useFetchData<{
-    status: string;
-    data: Entry[];
-  }>(`/analytics/pnl/overall?fromDate=${filters[0]}&toDate=${filters[1]}`);
-  console.log("OPNL = ", overallPnl);
+  // const { data: overallPnl } = useFetchData<{
+  //   status: string;
+  //   data: Entry[];
+  // }>(`/analytics/pnl/overall?fromDate=${filters[0]}&toDate=${filters[1]}`);
+  // console.log("OPNL = ", overallPnl);
 
-  const pnlCategories = overallPnl?.data.data.map((item) => item._id);
-  const pnlData = overallPnl?.data.data.map(
-    (item) => Math.round(item.totalPnL * 100) / 100
-  );
-  console.log(pnlData);
+  // const pnlCategories = overallPnl?.data.data.map((item) => item._id);
+  // const pnlData = overallPnl?.data.data.map(
+  //   (item) => Math.round(item.totalPnL * 100) / 100
+  // );
+  // console.log(pnlData);
 
-  const barGraphData = [
-    {
-      name: "Net P&L",
-      data: pnlData ? pnlData : [],
-    },
-  ];
+  // const barGraphData = [
+  //   {
+  //     name: "Net P&L",
+  //     data: pnlData ? pnlData : [],
+  //   },
+  // ];
 
-  const handleFilterChange = (dateStrings: [string, string]) => {
-    setFilters(dateStrings);
-  };
+  // const handleFilterChange = (dateStrings: [string, string]) => {
+  //   setFilters(dateStrings);
+  // };
 
   const darkMode = useAppSelector(state => state.theme.darkMode)
 
   console.log('responseCountData:', responseCountData)
   console.log('responseCountCategories:', responseCountCategories)
-  const state = {
-    series: [76],
-    options: {
-      chart: {
-        type: 'radialBar',
-        offsetY: -20
-      },
-      plotOptions: {
-        radialBar: {
-          startAngle: -90,
-          endAngle: 90,
-          track: {
-            background: '#e7e7e7',
-            strokeWidth: '97%',
-            margin: 5,
-            dropShadow: {
-              enabled: true,
-              top: 2,
-              left: 0,
-              color: '#999',
-              opacity: 1,
-              blur: 2
-            }
-          },
-          dataLabels: {
-            name: {
-              show: true,
-              color: darkMode ? '#fff' : '#000',
-              fontSize: '15px',
-              offsetY: -25
-            },
-            value: {
-              show: true,
-              color: darkMode ? '#fff' : '#000',
-              fontSize: '30px',
-              offsetY: -5,
-              formatter: function (val: number) {
-                return val + '%'
-              }
-            }
-          },
-          hollow: {
-            margin: 15,
-            size: '70%'
-          },
-          cornerRadius: 30,
-          lineCap: 'round'
-        }
-      },
-      fill: {
-        type: 'solid',
-        colors: ['#34D399']
-      },
-      labels: ['Connected Users']
-    }
-  }
+  // const state = {
+  //   series: [76],
+  //   options: {
+  //     chart: {
+  //       type: 'radialBar',
+  //       offsetY: -20
+  //     },
+  //     plotOptions: {
+  //       radialBar: {
+  //         startAngle: -90,
+  //         endAngle: 90,
+  //         track: {
+  //           background: '#e7e7e7',
+  //           strokeWidth: '97%',
+  //           margin: 5,
+  //           dropShadow: {
+  //             enabled: true,
+  //             top: 2,
+  //             left: 0,
+  //             color: '#999',
+  //             opacity: 1,
+  //             blur: 2
+  //           }
+  //         },
+  //         dataLabels: {
+  //           name: {
+  //             show: true,
+  //             color: darkMode ? '#fff' : '#000',
+  //             fontSize: '15px',
+  //             offsetY: -25
+  //           },
+  //           value: {
+  //             show: true,
+  //             color: darkMode ? '#fff' : '#000',
+  //             fontSize: '30px',
+  //             offsetY: -5,
+  //             formatter: function (val: number) {
+  //               return val + '%'
+  //             }
+  //           }
+  //         },
+  //         hollow: {
+  //           margin: 15,
+  //           size: '70%'
+  //         },
+  //         cornerRadius: 30,
+  //         lineCap: 'round'
+  //       }
+  //     },
+  //     fill: {
+  //       type: 'solid',
+  //       colors: ['#34D399']
+  //     },
+  //     labels: ['Connected Users']
+  //   }
+  // }
 
 
   return (
@@ -303,16 +271,16 @@ const AdminDashboard = () => {
         </Row>
         <Flex>
 
-          <div className='w-[48%] flex flex-col w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
+          <div className=' w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
             {/* {responseCountData.length > 0 ? ( */}
-            <AreaChart
+            {/* <AreaChart
               data={dummyAreaChartData}
               categories={dummyAreaChartCategories}
               title='Response Count'
               colors={['#6366F1', '#34D399']}
               style={{ width: '100%', height: '300px' }}
               darkMode={darkMode}
-            />
+            /> */}
             {/* ) : (
 
               <p className="p-4">No data available</p>
@@ -321,13 +289,15 @@ const AdminDashboard = () => {
 
           <div className='w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
             {/* {responseCountData.length > 0 ? ( */}
-            <div className='w-full mt-16'>
-              <ReactApexChart
+            {/* <div className='w-full mt-16 flex justify-center items-center'> */}
+              {/* <ReactApexChart
+                //@ts-ignore
                 options={state.options}
                 series={state.series}
                 type='radialBar'
-              />
-            </div>
+              /> */}
+              {/* <h1>Connected Users: No Data</h1>
+            </div> */}
             {/* ) : (
               <p className="p-4">No data available</p>
             )} */}
@@ -355,15 +325,16 @@ const AdminDashboard = () => {
               darkMode={darkMode}
             />
           </div>
-          <div className='w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
-
-            <DonutChart
+          <div className='w-[48%] flex flex-col items-center justify-center border rounded-xl border-slate-200 bg-white m-5'>
+                <h1>Overall Win Percentage</h1>
+                <h1>No Data</h1>
+            {/* <DonutChart
               data={donutChartData}
               labels={donutChartLabels}
               title='Overall Win Percentage'
               colors={['#34D399', '#F87171']}
               darkMode={darkMode}
-            />
+            /> */}
           </div>
         </Flex>
       </div>
