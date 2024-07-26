@@ -1,6 +1,6 @@
-import {   Avatar, Flex, Button } from 'antd'
+import {   Avatar, Flex } from 'antd'
 import avatarImg from '../../../assets/images/dashboard/avatar.png'
-import exportIcon from '../../../assets/images/dashboard/Icon.svg'
+// import exportIcon from '../../../assets/images/dashboard/Icon.svg'
 import { IUser } from '../../../types/data'
 
 interface ProfileSectionProps {

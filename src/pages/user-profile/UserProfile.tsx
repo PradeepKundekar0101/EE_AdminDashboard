@@ -25,11 +25,6 @@ import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "antd/es/radio";
 
-import { useAppSelector } from "../../redux/hooks";
-const donutChartData = [80.3, 19.7];
-const donutChartLabels = ["Win", "Loss"];
-
-
 const dummyProfileData = [
   { title: "Total holding value", value: "0", color: "#000" },
   { title: "Total holdings quantity", value: "0", color: "#000" },
@@ -216,6 +211,7 @@ const UserProfile = () => {
       }
 
       // Replace the last two categories with "Yesterday" and "Today" for 7 days and 1 month
+      //@ts-ignore
       if (categories.length >= 2 && timeRange !== "1year") {
         categories[categories.length - 2] = "Yesterday";
         categories[categories.length - 1] = "Today";
@@ -261,12 +257,11 @@ const UserProfile = () => {
 
     return numValue.toFixed(2);
   };
-  const darkMode = useAppSelector((state) => state.theme.darkMode);
-
 
 
   const { data: winLossData } = useFetchData(`/analytics/getWinLossRatio/${userId}`);
   console.log("winLossData", winLossData)
+  //@ts-ignore
   const donutChartData = [winLossData?.data.winPercentage, winLossData?.data.lossPercentage];
   const donutChartLabels = ["Win", "Loss"];
 
@@ -275,7 +270,7 @@ const UserProfile = () => {
 
   return (
     <CustomLayout>
-      <div className="p-10">
+      <div className="p-10 bg-white">
         <ProfileSection
           //@ts-ignore
           user={userData && userData?.data}
@@ -285,9 +280,9 @@ const UserProfile = () => {
             <Col span={6} key={index}>
               <StatsBox
                 title={item.title}
-                value={formatValue(item.value)}
                 //@ts-ignore
-                color={item.color}
+                value={formatValue(item.value)} color={"green"}                //@ts-ignore
+                // color={item.color}
               />
             </Col>
           ))}
@@ -312,9 +307,8 @@ const UserProfile = () => {
               categories={barGraphCategories}
               title="P&L Graph"
               colors={["#34D399", "#F87171"]}
-
-              darkMode={darkMode}
-            />
+              />
+              </div>
           </div>
           <div className="w-[48%] border rounded-xl border-slate-200 bg-white">
             <DonutChart
@@ -322,7 +316,6 @@ const UserProfile = () => {
               labels={donutChartLabels}
               title="Win Percentage"
               colors={["#34D399", "#F87171"]}
-              darkMode={darkMode}
             />
           </div>
         </Flex>

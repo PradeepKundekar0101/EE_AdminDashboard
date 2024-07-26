@@ -46,7 +46,7 @@ import {
     const [uploadedFile, setUploadedFile] = useState<File | null>(null);
     const [editedContent, setEditedContent] = useState("");
 
-    const [showScrollButton, setShowScrollButton] = useState(false);
+    // const [showScrollButton, setShowScrollButton] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLDivElement>(null);
@@ -57,9 +57,9 @@ import {
     
       const handleScroll = () => {
         if (listRef.current) {
-          const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-          const atBottom = scrollHeight - scrollTop === clientHeight;
-          setShowScrollButton(!atBottom);
+          // const { scrollTop, scrollHeight, clientHeight } = listRef.current;
+          // const atBottom = scrollHeight - scrollTop === clientHeight;
+          // setShowScrollButton(!atBottom);
         }
       };
     
