@@ -6,13 +6,15 @@ interface AreaChartProps {
   categories: string[]
   title: string
   colors: string[]
+  darkMode?:boolean
 }
 
 const AreaChart: React.FC<AreaChartProps> = ({
   data,
   categories,
   title,
-  colors
+  colors,
+  darkMode
 }) => {
   const options = {
     chart: {
@@ -68,7 +70,15 @@ const AreaChart: React.FC<AreaChartProps> = ({
     colors: colors,
     title: {
       text: title,
-      align: 'left'
+      align: 'left',
+      style: {
+        color: darkMode ? '#fff' : '#000',
+      }
+    },
+    legend: {
+      labels: {
+        colors: darkMode ? '#ffffff' : '#000000'
+      }
     }
   }
 

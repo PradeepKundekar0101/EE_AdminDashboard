@@ -36,6 +36,7 @@ export const JournalTypeSelector = ({handleFilterChange}:{handleFilterChange:any
     onChange={(value) =>
       handleFilterChange("journalType", value.toLowerCase())
     }
+    className='dark:bg-gray-600 dark:text-black'
   />
   )
 }
