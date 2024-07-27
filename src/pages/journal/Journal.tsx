@@ -242,7 +242,7 @@ const Journal = () => {
 
   return (
     <CustomLayout>
-      <div className='px-10 dark:bg-dark-blue bg-white'>
+      <div className='px-10'>
         <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
           <div className='flex w-full justify-between py-7'>
             <Input.Search
