@@ -21,6 +21,7 @@ import CustomTable from "../../common/table/CustomTable";
 import useQuestionsService from "../../../hooks/useQuestion";
 import {  PlusCircleOutlined } from "@ant-design/icons";
 import useAxios from '../../../hooks/useAxios'
+import { useAppSelector } from "../../../redux/hooks";
 
 const { Option } = Select;
 
@@ -218,6 +219,7 @@ const JournalManagement: React.FC = () => {
       ),
     },
   ];
+  const darkMode = useAppSelector((state) => state.theme.darkMode);
 
 
   return (
@@ -271,7 +273,7 @@ const JournalManagement: React.FC = () => {
             <Switch />
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type={darkMode ? "default":"primary"} htmlType="submit">
               {drawerType === "add" ? "Submit" : "Update"}
             </Button>
           </Form.Item>

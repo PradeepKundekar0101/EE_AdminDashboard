@@ -1,12 +1,11 @@
-
 import CustomLayout from '../../components/layout/custom-layout/CustomLayout'
 import JournalManagement from '../../components/layout/questions/UserQuestions'
 
 const Questions = () => {
   return (
     <CustomLayout>
-        <JournalManagement />
-   </CustomLayout>
+      <JournalManagement />
+    </CustomLayout>
   )
 }
 
