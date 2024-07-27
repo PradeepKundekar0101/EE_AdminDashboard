@@ -24,9 +24,6 @@ import moment from "moment";
 // import dayjs from "dayjs";
 import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "antd/es/radio";
-import { useAppSelector } from "../../redux/hooks";
-const donutChartData = [80.3, 19.7];
-const donutChartLabels = ["Win", "Loss"];
 
 const dummyProfileData = [
   { title: "Total holding value", value: "0", color: "#000" },
@@ -214,6 +211,7 @@ const UserProfile = () => {
       }
 
       // Replace the last two categories with "Yesterday" and "Today" for 7 days and 1 month
+      //@ts-ignore
       if (categories.length >= 2 && timeRange !== "1year") {
         categories[categories.length - 2] = "Yesterday";
         categories[categories.length - 1] = "Today";
@@ -247,27 +245,32 @@ const UserProfile = () => {
   );
 
   const formatValue = (value: string | number): string => {
-    const numValue = typeof value === 'string' ? parseFloat(value) : value;
-    
+    const numValue = typeof value === "string" ? parseFloat(value) : value;
+
     if (isNaN(numValue)) {
       return value.toString();
     }
-    
+
     if (Number.isInteger(numValue)) {
       return numValue.toString();
     }
-    
+
     return numValue.toFixed(2);
   };
-  const darkMode = useAppSelector((state) => state.theme.darkMode);
 
+
+  const { data: winLossData } = useFetchData(`/analytics/getWinLossRatio/${userId}`);
+  console.log("winLossData", winLossData)
+  //@ts-ignore
+  const donutChartData = [winLossData?.data.winPercentage, winLossData?.data.lossPercentage];
+  const donutChartLabels = ["Win", "Loss"];
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <CustomLayout>
-      <div className="p-10">
+      <div className="p-10 bg-white">
         <ProfileSection
           //@ts-ignore
           user={userData && userData?.data}
@@ -277,15 +280,15 @@ const UserProfile = () => {
             <Col span={6} key={index}>
               <StatsBox
                 title={item.title}
-                value={formatValue(item.value)}
                 //@ts-ignore
-                color={item.color}
+                value={formatValue(item.value)} color={"green"}                //@ts-ignore
+                // color={item.color}
               />
             </Col>
           ))}
         </Row>
         <Flex justify="space-between" className="mt-10 px-10">
-          <div className="w-[48%] flex flex-col">
+          <div className="w-[48%] flex flex-col ">
             <div className="flex justify-end">
               <Dropdown overlay={menu} placement="bottomRight" arrow>
                 <Button>
@@ -297,21 +300,22 @@ const UserProfile = () => {
                 </Button>
               </Dropdown>
             </div>
+            <div className="border rounded-xl border-slate-200 bg-white">
+
             <BarGraph
               data={barGraphData}
               categories={barGraphCategories}
               title="P&L Graph"
               colors={["#34D399", "#F87171"]}
-              darkMode={darkMode}
-            />
+              />
+              </div>
           </div>
-          <div className="w-[48%]">
+          <div className="w-[48%] border rounded-xl border-slate-200 bg-white">
             <DonutChart
               data={donutChartData}
               labels={donutChartLabels}
               title="Win Percentage"
               colors={["#34D399", "#F87171"]}
-              darkMode={darkMode}
             />
           </div>
         </Flex>
@@ -349,7 +353,7 @@ const UserProfile = () => {
           <RecentTradesTable userId={userId!} />
         </div>
         <div className="mt-10 px-10">
-          <CustomCalendar userId={userId || ''} />
+          <CustomCalendar userId={userId || ""} />
         </div>
       </div>
     </CustomLayout>

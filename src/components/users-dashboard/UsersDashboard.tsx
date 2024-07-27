@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Tag } from 'antd'
-import { CloudDownloadOutlined } from '@ant-design/icons'
+// import { CloudDownloadOutlined } from '@ant-design/icons'
 
 import { Flex } from 'antd'
 
@@ -24,6 +24,7 @@ const UsersDashboard: React.FC = () => {
       const res= await getAllUsers();
       if(res.status===200){
         setUsers(res.data.data);
+        console.log("USer --- ",users)
         setTotalUsers(res.data.data.length);
       }
     } catch (error) {
@@ -38,6 +39,13 @@ const UsersDashboard: React.FC = () => {
   },[])
 
   const columns: ColumnsType<IUser> = [
+    {
+      title: '',
+      dataIndex: 'profile',
+      key: 'email',
+      render: (_, record) => <img height={40} width={40} src={record.profile_image_url || "/avatar.png"} />,
+      // sorter: (a, b) => a.email.localeCompare(b.email),
+    },
     {
       title: 'User',
       dataIndex: 'firstName',
@@ -104,9 +112,9 @@ const UsersDashboard: React.FC = () => {
             </p>
             <p className='text-light-grey'>List of all users </p>
           </div>
-          <Button type='default' icon={<CloudDownloadOutlined />}>
+          {/* <Button type='default' icon={<CloudDownloadOutlined />}>
             Export
-          </Button>
+          </Button> */}
         </Flex>
       </div>
       <CustomTable totalDocuments={users.length} loading={isLoading} data={users} columns={columns} pageSize={10} />

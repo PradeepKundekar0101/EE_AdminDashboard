@@ -1,6 +1,6 @@
-import {   Avatar, Flex, Button } from 'antd'
+import {   Avatar, Flex } from 'antd'
 import avatarImg from '../../../assets/images/dashboard/avatar.png'
-import exportIcon from '../../../assets/images/dashboard/Icon.svg'
+// import exportIcon from '../../../assets/images/dashboard/Icon.svg'
 import { IUser } from '../../../types/data'
 
 interface ProfileSectionProps {
@@ -27,7 +27,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ user }) => {
           <p>Occupation: {user?.occupation || "N/A"} </p>
         </div>
       </div>
-      <Button className='absolute right-5 top-5 h-10 px-4 rounded-lg' icon={<img src={exportIcon} />}>Export</Button>
+      {/* <Button className='absolute right-5 top-5 h-10 px-4 rounded-lg' icon={<img src={exportIcon} />}>Export</Button> */}
     </div>
   )
 }
