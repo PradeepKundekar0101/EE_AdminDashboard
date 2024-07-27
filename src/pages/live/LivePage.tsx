@@ -344,7 +344,8 @@ const Live: React.FC = () => {
     <CustomLayout>
       <div>
         <h1 className=" text-3xl font-semibold px-5 py-4">Live Positions</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">{
+          liveData.length==0 && <h1>No Positions Available now</h1>}
           {liveData.map((userData) => (
             <div
               key={userData.user}
