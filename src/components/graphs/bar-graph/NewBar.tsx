@@ -1,40 +1,44 @@
 import React from 'react';
-// import ReactApexChart from 'react-apexcharts';
+import ReactApexChart from 'react-apexcharts';
+import { ApexOptions } from 'apexcharts';
 
 interface BarGraphProps {
-  data: { name: string; data: number[] }[];
+  data: number[];
   categories: string[];
   title: string;
   colors: string[];
   darkMode?: boolean;
+  type: 'bar' | 'line';
 }
 
-const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors, darkMode }) => {
-  console.log(data)
-  const options = {
+const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors, darkMode, type }) => {
+  const options: ApexOptions = {
     chart: {
-      type: 'bar',
-      height: 350,
+      type: type,
+      height: 300,
+      toolbar: {
+        show: false
+      }
     },
     plotOptions: {
-        bar: {
-            horizontal: false,
-            columnWidth: '55%',
-            colors: {
-              ranges: [
-                {
-                  from: -1000,
-                  to: 0,
-                  color: '#F87171',
-                },
-                {
-                  from: 0,
-                  to: 1000,
-                  color: '#34D399',
-                },
-              ],
+      bar: {
+        horizontal: false,
+        columnWidth: '55%',
+        colors: {
+          ranges: [
+            {
+              from: -Infinity,
+              to: 0,
+              color: colors[1]
             },
-        }
+            {
+              from: 0,
+              to: Infinity,
+              color: colors[0]
+            }
+          ]
+        },
+      },
     },
     dataLabels: {
       enabled: false,
@@ -42,10 +46,17 @@ const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors, da
     xaxis: {
       categories: categories,
       labels: {
-        show: true,
         style: {
-          colors: darkMode ? '#ffffff' : '#000000'
-        }
+          colors: darkMode ? '#ffffff' : '#000000',
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        formatter: (value) => value.toFixed(2),
+        style: {
+          colors: darkMode ? '#ffffff' : '#000000',
+        },
       },
     },
     colors: colors,
@@ -53,30 +64,43 @@ const BarGraph: React.FC<BarGraphProps> = ({ data, categories, title, colors, da
       text: title,
       align: 'left',
       style: {
-        color: darkMode ? '#fff' : '#000'
-      }
+        color: darkMode ? '#fff' : '#000',
+      },
     },
     grid: {
-      show: false,
+      borderColor: darkMode ? '#ffffff20' : '#00000020',
     },
-    yaxis: {
-      show: false,
+    tooltip: {
+      theme: darkMode ? 'dark' : 'light'
+    },
+    stroke: {
+      width: type === 'line' ? 4 : 0,
+      colors: [type === 'line' ? colors[0] : '']
+    },
+    fill: {
+      type: type === 'line' ? 'gradient' : 'solid',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.7,
+        opacityTo: 0.9,
+        stops: [0, 100]
+      }
     },
   };
-  console.log(options)
 
-  // const series = data.map((serie) => ({
-  //   ...serie,
-  //   data: serie.data.map((value) => (value >= 0 ? value : -value)),
-  // }));
-  // console.log(series)
+  const series = [{
+    name: 'Net P&L',
+    data: data
+  }];
 
   return (
-    <div className="p-4 h-[350px] flex flex-col items-center justify-center border rounded-xl border-slate-200 bg-white m-5">
-      <h1>No Data</h1>
-      {/* <ReactApexChart 
-      //@ts-ignore
-      options={options} series={data} type="bar" height={350} /> */}
+    <div className="w-full h-full">
+      <ReactApexChart 
+        options={options} 
+        series={series} 
+        type={type} 
+        height="100%" 
+      />
     </div>
   );
 };

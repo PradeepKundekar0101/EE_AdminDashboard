@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Tag } from 'antd'
+import { Button, Input, Tag } from 'antd'
 // import { CloudDownloadOutlined } from '@ant-design/icons'
 
 import { Flex } from 'antd'
@@ -12,11 +12,15 @@ import { useAppSelector } from '../../redux/hooks'
 
 
 const UsersDashboard: React.FC = () => {
+
   const {getAllUsers} = useUserService();
   const user = useAppSelector((state)=>state.auth.user)
   const [users, setUsers] = useState<IUser[]>([]);
+  const [originalUsers, setOriginalUsers] = useState<IUser[]>([]);
+  
   const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading,setIsLoading] = useState(false);
+  const [searchTerm,setSearchTerm] = useState("");
 
   const fetchAllUser = async()=>{
     try {
@@ -24,7 +28,7 @@ const UsersDashboard: React.FC = () => {
       const res= await getAllUsers();
       if(res.status===200){
         setUsers(res.data.data);
-        console.log("USer --- ",users)
+        setOriginalUsers(res.data.data)
         setTotalUsers(res.data.data.length);
       }
     } catch (error) {
@@ -37,6 +41,20 @@ const UsersDashboard: React.FC = () => {
   useEffect(()=>{
     fetchAllUser();
   },[])
+  useEffect(()=>{
+    if(searchTerm!==""){
+      const filteredUser = users.filter((user)=>{
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        const {email,firstName,lastName} = user;
+        if(email?.toLowerCase().includes(lowerSearchTerm) || firstName?.toLowerCase().includes(lowerSearchTerm) || lastName?.toLowerCase().includes(lowerSearchTerm) )
+          return user;
+      })
+      setUsers(filteredUser)
+    }
+    else{
+      setUsers(originalUsers)
+    }
+  },[searchTerm])
 
   const columns: ColumnsType<IUser> = [
     {
@@ -110,8 +128,12 @@ const UsersDashboard: React.FC = () => {
               <span className='text-lg font-bold mr-2'> Users</span>
               <Tag color='cyan'>Total Users: {totalUsers}</Tag>
             </p>
-            <p className='text-light-grey'>List of all users </p>
+           
           </div>
+          <div className='w-1/4'>
+            <Input.Search onChange={(e)=>{setSearchTerm(e.target.value)}} value={searchTerm} placeholder='Search'/>
+
+            </div>
           {/* <Button type='default' icon={<CloudDownloadOutlined />}>
             Export
           </Button> */}

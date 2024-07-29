@@ -1,345 +1,267 @@
-
-import {
-  // Button,
-  Col,
-  // DatePicker,
-  // Dropdown,
-  Flex,
-  // Menu,
-  // MenuProps,
-  Row,
-} from "antd";
+import { Col, DatePicker, Select, Flex, Row } from "antd";
 import StatsBox from "../../components/common/profile-card/ProfileCard";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
-// import DonutChart from "../../components/graphs/donut-chart/DonutChart";
 import BarGraph from "../../components/graphs/bar-graph/NewBar";
 import useFetchData from "../../hooks/useFetchData";
-import { useState } from "react";
-import moment from "moment";
-// import AreaChart from "../../components/graphs/area-chart/AreaChart";
-// import ReactApexChart from "react-apexcharts";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "../../redux/hooks";
-
-// const { RangePicker } = DatePicker;
-
-const dummyProfileData = [
-  { title: 'Total holding value', value: '0', color: '#000' },
-  { title: 'Total holdings quantity', value: '0', color: '#000' },
-  { title: "Today's Total P&L ", value: '0', color: 'green' },
-  { title: 'P&L Percentage', value: '0%', color: 'green' }
-]
-
-
-const barGraphData = [
-  {
-    name: 'Net P&L',
-    data: [10, -20, 15, 30, -25, 10, -15]
-  }
-]
-const barGraphCategories = [
-  '18 June 2024',
-  '19 June 2024',
-  '20 June 2024',
-  '21 June 2024',
-  '22 June 2024',
-  'Yesterday',
-  'Today'
-]
-
-// const donutChartData = [80.3, 19.7]
-// const donutChartLabels = ['Win', 'Loss']
-
-// const timeRangeItems: MenuProps["items"] = [
-//   { key: "7days", label: "Last 7 Days" },
-//   { key: "1month", label: "Last Month" },
-//   { key: "1year", label: "Last Year" },
-// ];
-
-// const menu = <Menu  items={timeRangeItems} />;
+import AreaChart from "../../components/graphs/area-chart/AreaChart";
+import NoData from "../../components/no-data";
+import RadialSemicircle from "../../components/graphs/radial-graph/ConnectedUser";
+import dayjs, { Dayjs } from "dayjs";
+import DonutChart from "../../components/graphs/donut-chart/DonutChart";
 
 interface Entry {
-  date: string
-  entry: number
-  exit: number
+  date: string;
+  entry: number;
+  exit: number;
+}
+interface SummaryData {
+  totalHoldings: number;
+  totalPnL: number;
+  totalTradesQuantity: number;
+  totalHoldingsQuantity: number;
 }
 
-
-// let state = {
-//   series: [76],
-//   options: {
-//     chart: {
-//       type: "radialBar",
-//       offsetY: -20,
-//     },
-//     plotOptions: {
-//       radialBar: {
-//         startAngle: -90,
-//         endAngle: 90,
-//         track: {
-//           background: "#e7e7e7",
-//           strokeWidth: "97%",
-//           margin: 5,
-//           dropShadow: {
-//             enabled: true,
-//             top: 2,
-//             left: 0,
-//             color: "#999",
-//             opacity: 1,
-//             blur: 2,
-//           },
-//         },
-//         dataLabels: {
-//           name: {
-//             show: true,
-//             color: "#888",
-//             fontSize: "15px",
-//             offsetY: -25,
-//           },
-//           value: {
-//             show: true,
-//             color: "#111",
-//             fontSize: "30px",
-//             offsetY: -5,
-//             formatter: function (val: number) {
-//               return val + "%";
-//             },
-//           },
-//         },
-//         hollow: {
-//           margin: 15,
-//           size: "70%",
-//         },
-//         cornerRadius: 30,
-//         lineCap: "round",
-//       },
-//     },
-//     fill: {
-//       type: "solid",
-//       colors: ["#34D399"],
-//     },
-//     labels: ["Connected Users"],
-//   },
-// };
-
-
 const AdminDashboard = () => {
-  const getFormattedDate = (date: Date): string =>
-    date.toISOString().split('T')[0]
-  const yesterday = moment().subtract(1, 'days').toDate()
-  const defaultFromDate = getFormattedDate(yesterday)
-  const defaultToDate = getFormattedDate(new Date())
+  const [summaryData, setSummaryData] = useState<SummaryData>({
+    totalHoldings: 0,
+    totalHoldingsQuantity: 0,
+    totalPnL: 0,
+    totalTradesQuantity: 0,
+  });
+  const [graphType, setGraphType] = useState<"bar" | "line">("bar");
+  const [overallPnLdateRange, setOverallPnLDateRange] = useState<
+    [dayjs.Dayjs, dayjs.Dayjs]
+  >([dayjs().startOf("month"), dayjs()]);
 
+  const [journalDateRange, setJournalDateRange] = useState<[Dayjs, Dayjs]>([
+    dayjs().subtract(7, "day"),
+    dayjs(),
+  ]);
 
-  const [dateRange] = useState<[string, string]>([
-    defaultFromDate,
-    defaultToDate
-  ])
-
-
-
+  //API CALLS
+  //CALL 0: To fetch the Journal response trend data
   const {
-    data: apiResponse,
-    // loading,
-    // error
+    data: summaryDataResponse,
+    loading: isSummaryDataLoading,
+    error: summaryDataError,
+  } = useFetchData<{ status: string; data: any }>(`/analytics/summary`);
+  useEffect(() => {
+    if (summaryDataResponse?.data?.data) {
+      setSummaryData(summaryDataResponse.data.data);
+    }
+  }, [summaryDataResponse]);
+
+  //CALL1: To fetch the Journal response trend data
+  const {
+    data: journalResponseTrend,
+    loading: isJournalResponseCountLoading,
+    error: journalResponseCountError,
   } = useFetchData<{ status: string; data: Entry[] }>(
-    `/analytics/journalTypeTrend?fromDate=${dateRange[0]}&toDate=${dateRange[1]}`
-  )
-
-
-  const responseCountData =
-    apiResponse?.status === 'success' && apiResponse?.data?.length > 0
+    `/analytics/journalTypeTrend?fromDate=${journalDateRange[0].format(
+      "YYYY-MM-DD"
+    )}&toDate=${journalDateRange[1].format("YYYY-MM-DD")}`
+  );
+  //FORMATTING the journal response trend data
+  const formattedJournalResponseTrendData =
+    journalResponseTrend?.status === "success" &&
+    journalResponseTrend?.data?.length > 0
       ? [
-          { name: 'Entry', data: apiResponse.data.map(entry => entry.entry) },
-          { name: 'Exit', data: apiResponse.data.map(entry => entry.exit) }
+          {
+            name: "Entry",
+            data: journalResponseTrend.data.map((entry) => entry.entry),
+          },
+          {
+            name: "Exit",
+            data: journalResponseTrend.data.map((entry) => entry.exit),
+          },
         ]
-      : []
-  console.log('responseCountData: ', responseCountData)
+      : [];
+  const journalResponseTrendCategory =
+    journalResponseTrend?.status === "success"
+      ? journalResponseTrend.data.map((entry) => entry.date)
+      : [];
 
-  const responseCountCategories =
-    apiResponse?.status === 'success'
-      ? apiResponse.data.map(entry => entry.date)
-      : []
+  //Fetch Connected Vs Not connected
+  const {
+    data: connectedUsersRatio,
+    loading: isConnectedUsersRatioLoading,
+    error: connectedUsersError,
+  } = useFetchData<{
+    status: string;
+    data: { connected: number };
+  }>(`/analytics/getConnectedUsersRatio`);
 
+  //Fetch the overall PnL
+  const { data: overallPnl, loading: pnlLoading } = useFetchData<{
+    status: string;
+    data: { data: { _id: string; totalPnL: number }[] };
+  }>(
+    `/analytics/pnl/overall?fromDate=${overallPnLdateRange[0].format(
+      "YYYY-MM-DD"
+    )}&toDate=${overallPnLdateRange[1].format("YYYY-MM-DD")}`
+  );
+  const pnlCategories =
+    overallPnl?.data?.data?.map((item) => dayjs(item._id).format("DD MMM")) ||
+    [];
+  const pnlData =
+    overallPnl?.data?.data?.map((item) => Number(item.totalPnL.toFixed(2))) ||
+    [];
 
-  // const { data: userCountData } = useFetchData<{
-  //   status: string;
-  //   data: Entry[];
-  // }>(`/analytics/getConnectedUsersRatio`);
-  // state.series = [Math.round(userCountData?.data?.connected * 100) / 100];
+  //Fetch the overall PnL
+  const { data: overallWinLossResponse, loading: winLossRatioLoading } =
+    useFetchData<{
+      status: string;
+      data: { data: { winCnt: number; lossCnt: number } };
+    }>(`/analytics/getOverallWinLossRation`);
 
-  // const { data: overallPnl } = useFetchData<{
-  //   status: string;
-  //   data: Entry[];
-  // }>(`/analytics/pnl/overall?fromDate=${filters[0]}&toDate=${filters[1]}`);
-  // console.log("OPNL = ", overallPnl);
-
-  // const pnlCategories = overallPnl?.data.data.map((item) => item._id);
-  // const pnlData = overallPnl?.data.data.map(
-  //   (item) => Math.round(item.totalPnL * 100) / 100
-  // );
-  // console.log(pnlData);
-
-  // const barGraphData = [
-  //   {
-  //     name: "Net P&L",
-  //     data: pnlData ? pnlData : [],
-  //   },
-  // ];
-
-  // const handleFilterChange = (dateStrings: [string, string]) => {
-  //   setFilters(dateStrings);
-  // };
-
-  const darkMode = useAppSelector(state => state.theme.darkMode)
-
-  console.log('responseCountData:', responseCountData)
-  console.log('responseCountCategories:', responseCountCategories)
-  // const state = {
-  //   series: [76],
-  //   options: {
-  //     chart: {
-  //       type: 'radialBar',
-  //       offsetY: -20
-  //     },
-  //     plotOptions: {
-  //       radialBar: {
-  //         startAngle: -90,
-  //         endAngle: 90,
-  //         track: {
-  //           background: '#e7e7e7',
-  //           strokeWidth: '97%',
-  //           margin: 5,
-  //           dropShadow: {
-  //             enabled: true,
-  //             top: 2,
-  //             left: 0,
-  //             color: '#999',
-  //             opacity: 1,
-  //             blur: 2
-  //           }
-  //         },
-  //         dataLabels: {
-  //           name: {
-  //             show: true,
-  //             color: darkMode ? '#fff' : '#000',
-  //             fontSize: '15px',
-  //             offsetY: -25
-  //           },
-  //           value: {
-  //             show: true,
-  //             color: darkMode ? '#fff' : '#000',
-  //             fontSize: '30px',
-  //             offsetY: -5,
-  //             formatter: function (val: number) {
-  //               return val + '%'
-  //             }
-  //           }
-  //         },
-  //         hollow: {
-  //           margin: 15,
-  //           size: '70%'
-  //         },
-  //         cornerRadius: 30,
-  //         lineCap: 'round'
-  //       }
-  //     },
-  //     fill: {
-  //       type: 'solid',
-  //       colors: ['#34D399']
-  //     },
-  //     labels: ['Connected Users']
-  //   }
-  // }
-
+  const handlePnLDateRangeChange = (dates: any) => {
+    if (dates) {
+      setOverallPnLDateRange(dates);
+    }
+  };
+  const darkMode = useAppSelector((state) => state.theme.darkMode);
+  const handleJournalDateRangeChange = (dates: any) => {
+    if (dates) {
+      setJournalDateRange(dates);
+    }
+  };
 
   return (
     <CustomLayout>
-      <div className='p-10'>
-        <h1 className='text-3xl font-semibold'>Hello Admin 👋</h1>
-        <Row gutter={16} className='mt-10 px-10'>
-          {dummyProfileData.map((item, index) => (
-            <Col span={6} key={index}>
-              <StatsBox
-                title={item.title}
-                value={item.value}
-
-                // @ts-ignore
-                color={item.color}
-              />
-            </Col>
-          ))}
+      <div className="p-10 bg-slate-100">
+        <h1 className="text-3xl font-semibold">Hello Admin 👋</h1>
+        {/* THE 1st ROW CARDS */}
+        <Row gutter={16} className="mt-10 ">
+          <Col span={6}>
+            <StatsBox
+              loading={isSummaryDataLoading}
+              title={"Total Holdings Value"}
+              value={summaryData?.totalHoldings.toString()}
+              color={"black"}
+            />
+          </Col>
+          <Col span={6}>
+            <StatsBox
+              loading={isSummaryDataLoading}
+              title={"Total Holdings Quantity"}
+              value={summaryData?.totalHoldingsQuantity.toString()}
+              color={"black"}
+            />
+          </Col>
+          <Col span={6}>
+            <StatsBox
+              title={"Today's total PnL"}
+              loading={isSummaryDataLoading}
+              value={summaryData?.totalPnL.toString()}
+              color={"black"}
+            />
+          </Col>
+          <Col span={6}>
+            <StatsBox
+              loading={isSummaryDataLoading}
+              title={"Total's total trades"}
+              value={summaryData?.totalTradesQuantity.toString()}
+              color={"black"}
+            />
+          </Col>
         </Row>
         <Flex>
-
-          <div className=' w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
-            {/* {responseCountData.length > 0 ? ( */}
-            {/* <AreaChart
-              data={dummyAreaChartData}
-              categories={dummyAreaChartCategories}
-              title='Response Count'
-              colors={['#6366F1', '#34D399']}
-              style={{ width: '100%', height: '300px' }}
-              darkMode={darkMode}
-            /> */}
-            {/* ) : (
-
-              <p className="p-4">No data available</p>
+          <div className="w-[48%] h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white m-5 p-3">
+            <div className="flex justify-between items-center mb-4">
+              <h1 className="text-lg font-semibold">Response trend</h1>
+              <DatePicker.RangePicker
+                value={journalDateRange}
+                onChange={handleJournalDateRangeChange}
+              />
+            </div>
+            {isJournalResponseCountLoading ? (
+              <div className="flex-1 flex items-center justify-center">
+                Loading...
+              </div>
+            ) : formattedJournalResponseTrendData.length === 0 ? (
+              <NoData />
+            ) : (
+              <AreaChart
+                data={formattedJournalResponseTrendData}
+                categories={journalResponseTrendCategory}
+                title=""
+                colors={["#6366F1", "#34D399"]}
+                darkMode={darkMode}
+              />
             )}
           </div>
-
-          <div className='w-[48%] flex flex-col border rounded-xl border-slate-200 bg-white m-5'>
-            {/* {responseCountData.length > 0 ? ( */}
-            {/* <div className='w-full mt-16 flex justify-center items-center'> */}
-              {/* <ReactApexChart
-                //@ts-ignore
-                options={state.options}
-                series={state.series}
-                type='radialBar'
-              /> */}
-              {/* <h1>Connected Users: No Data</h1>
-            </div> */}
-            {/* ) : (
-              <p className="p-4">No data available</p>
-            )} */}
+          <div className="w-[48%] flex h-[350px] flex-col border rounded-xl border-slate-200 bg-white m-5 p-3">
+            <h1>Broker Connected User ratio</h1>
+            {connectedUsersError && <h1>{connectedUsersError.message}</h1>}
+            <RadialSemicircle
+              value={
+                Number(connectedUsersRatio?.data?.connected.toFixed(0)) || 0
+              }
+            />
           </div>
         </Flex>
 
-        <Flex justify='space-between' className='mt-10 px-10'>
-          <div className='w-[48%] flex flex-col'>
-            <div className='flex justify-end'>
-              {/* <Dropdown overlay={menu} placement="bottomRight" arrow> */}
-              {/* <Button>
-                {timeRange === "7days"
-                  ? "Last 7 Days"
-                  : timeRange === "1month"
-                  ? "Last Month"
-                  : "Last Year"}
-              </Button> */}
-              {/* </Dropdown> */}
+        <Flex justify="space-between" className="mt-10">
+          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white m-5">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Net P&L</h2>
+              <div className="flex items-center space-x-2">
+                <Select
+                  defaultValue="bar"
+                  style={{ width: 120 }}
+                  onChange={(value: "bar" | "line") => setGraphType(value)}
+                  options={[
+                    { value: "bar", label: "Bar" },
+                    { value: "line", label: "Line" },
+                  ]}
+                />
+                <DatePicker.RangePicker
+                  value={overallPnLdateRange}
+                  onChange={handlePnLDateRangeChange}
+                />
+              </div>
             </div>
-            <BarGraph
-              data={barGraphData}
-              categories={barGraphCategories}
-              title='Net P&L Graph'
-              colors={['#34D399', '#F87171']}
-              darkMode={darkMode}
-            />
+            {pnlLoading ? (
+              <div className="flex-1 flex items-center justify-center">
+                Loading...
+              </div>
+            ) : (
+              <div className="flex-1">
+                <BarGraph
+                  data={pnlData}
+                  categories={pnlCategories}
+                  title=""
+                  colors={["#34D399", "#F87171"]}
+                  darkMode={darkMode}
+                  type={graphType}
+                />
+              </div>
+            )}
           </div>
-          <div className='w-[48%] flex flex-col items-center justify-center border rounded-xl border-slate-200 bg-white m-5'>
-                <h1>Overall Win Percentage</h1>
-                <h1>No Data</h1>
-            {/* <DonutChart
-              data={donutChartData}
-              labels={donutChartLabels}
-              title='Overall Win Percentage'
-              colors={['#34D399', '#F87171']}
-              darkMode={darkMode}
-            /> */}
+
+          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white m-5">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Overall Win Percentage</h2>
+            </div>
+            <div className="flex-1 flex items-center justify-center">
+              <DonutChart
+                title=""
+                data={[
+                  overallWinLossResponse?.data?.data.winCnt || 0,
+                  overallWinLossResponse?.data?.data?.lossCnt || 0,
+                ]}
+                labels={["Winners", "Losers"]}
+                colors={["#34D399", "#F87171"]}
+                darkMode={darkMode}
+              />
+            </div>
           </div>
         </Flex>
       </div>
     </CustomLayout>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;
