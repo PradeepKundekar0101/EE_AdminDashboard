@@ -138,7 +138,7 @@ const AdminDashboard = () => {
             <StatsBox
               loading={isSummaryDataLoading}
               title={"Total Holdings Value"}
-              value={summaryData?.totalHoldings.toString()}
+              value={summaryData?.totalHoldings.toFixed(2).toString()}
               color={"black"}
             />
           </Col>
@@ -154,7 +154,7 @@ const AdminDashboard = () => {
             <StatsBox
               title={"Today's total PnL"}
               loading={isSummaryDataLoading}
-              value={summaryData?.totalPnL.toString()}
+              value={summaryData?.totalPnL.toFixed(2).toString()}
               color={"black"}
             />
           </Col>
