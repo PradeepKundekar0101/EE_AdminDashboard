@@ -45,7 +45,7 @@ const AdminDashboard = () => {
   const {
     data: summaryDataResponse,
     loading: isSummaryDataLoading,
-    error: summaryDataError,
+    // error: summaryDataError,
   } = useFetchData<{ status: string; data: any }>(`/analytics/summary`);
   useEffect(() => {
     if (summaryDataResponse?.data?.data) {
@@ -57,7 +57,7 @@ const AdminDashboard = () => {
   const {
     data: journalResponseTrend,
     loading: isJournalResponseCountLoading,
-    error: journalResponseCountError,
+    // error: journalResponseCountError,
   } = useFetchData<{ status: string; data: Entry[] }>(
     `/analytics/journalTypeTrend?fromDate=${journalDateRange[0].format(
       "YYYY-MM-DD"
@@ -86,7 +86,7 @@ const AdminDashboard = () => {
   //Fetch Connected Vs Not connected
   const {
     data: connectedUsersRatio,
-    loading: isConnectedUsersRatioLoading,
+    // loading: isConnectedUsersRatioLoading,
     error: connectedUsersError,
   } = useFetchData<{
     status: string;
@@ -110,7 +110,7 @@ const AdminDashboard = () => {
     [];
 
   //Fetch the overall PnL
-  const { data: overallWinLossResponse, loading: winLossRatioLoading } =
+  const { data: overallWinLossResponse } =
     useFetchData<{
       status: string;
       data: { data: { winCnt: number; lossCnt: number } };
