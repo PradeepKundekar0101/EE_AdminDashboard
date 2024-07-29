@@ -39,8 +39,8 @@ const CustomCalendar: React.FC<CalendarProps> = ({ userId, dailyEntries ,onMonth
   );
   const {
     data: summaryData,
-    loading: isSummaryLoading,
-    error: summaryError,
+    // loading: isSummaryLoading,
+    // error: summaryError,
   } = useFetchData<{
     status: string;
     data: {

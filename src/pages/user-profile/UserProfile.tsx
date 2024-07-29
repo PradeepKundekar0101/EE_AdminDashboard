@@ -20,10 +20,10 @@ interface RatingResponse {
   }[];
 }
 
-interface MonthlyJournalEntry{
-  _id:string,
-  date:string
-}
+// interface MonthlyJournalEntry{
+//   _id:string,
+//   date:string
+// }
 
 const UserProfile = () => {
   const { userId } = useParams<{ userId: string }>();
