@@ -25,3 +25,7 @@ body {
   background: rgb(38, 38, 51);
   color: #fff;
 } */
+
+.ant-card-head{
+  background: #1a1c24 !important;color: #fff !important; 
+}

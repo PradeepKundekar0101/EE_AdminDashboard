@@ -153,7 +153,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             <Avatar size={40} src={user.profile_image_url || "/avatar.png"} />
           </Dropdown>
         </Header>
-        <Content style={{ overflowY: "scroll" }} className="bg-white dark:bg-dark-blue dark:text-white">
+        <Content style={{ overflowY: "scroll" }} className="bg-white dark:bg-dark-blue dark:text-white ">
           <div style={{ minHeight: 360 }}>{children}</div>
         </Content>
       </Layout>

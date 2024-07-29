@@ -1,5 +1,5 @@
 import {   Avatar, Flex } from 'antd'
-import avatarImg from '../../../assets/images/dashboard/avatar.png'
+
 // import exportIcon from '../../../assets/images/dashboard/Icon.svg'
 import { IUser } from '../../../types/data'
 
@@ -10,7 +10,7 @@ const ProfileSection: React.FC<ProfileSectionProps> = ({ user }) => {
   // console.log(user)
   return (
     <div className='bg-dark-blue relative flex w-full rounded-xl p-6 dark:border dark:border-white'>
-      <Avatar size={198} src={avatarImg} className='mx-8' />
+      <Avatar size={198} src={user?.profile_image_url||"/avatar.png"} className='mx-8' />
       <div className='mt-4 rounded-full'>
         <Flex align='center'>
           <h2 className=' mr-2 text-3xl text-white'>{user?.firstName} {user?.lastName}</h2>
