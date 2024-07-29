@@ -54,7 +54,7 @@ const CreateMentor: React.FC = () => {
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     try {
-      const res = await api.post('/mentor/create', data)
+       await api.post('/mentor/create', data)
       message.success("Mentor created successfully!")
       navigate("/admin/")
     } catch (error) {
