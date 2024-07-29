@@ -17,26 +17,26 @@ interface CustomLayoutProps {
 
 const lightTheme = {
   token: {
-    colorBgBase: '#ffffff',
-    colorText: '#000000',
+    colorBgBase: "#ffffff",
+    colorText: "#000000",
     // Add more tokens as needed
-  }
-}
+  },
+};
 
 const darkTheme = {
   token: {
-    colorBgBase: '#262633',
-    colorText: '#ffffff',
-    colorTextPlaceholder: '#ffffff',
-    colorBorder: '#ffffff',
-    fill: '#ffffff',
-    itemActiveBg: '#ffffff',
-    itemColor: '#ffffff',
-    itemHoverBg: '#ffffff',
-    
+    colorBgBase: "#262633",
+    colorText: "#ffffff",
+    colorTextPlaceholder: "#ffffff",
+    colorBorder: "#ffffff",
+    fill: "#ffffff",
+    itemActiveBg: "#ffffff",
+    itemColor: "#ffffff",
+    itemHoverBg: "#ffffff",
+
     // Add more tokens as needed
-  }
-}
+  },
+};
 
 const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const { user } = useAppSelector((state) => state.auth);
@@ -103,7 +103,13 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
     },
     {
       label: (
-        <button className="text-red-500 font-bold" onClick={() => { dispatch(logout()); navigate("/login") }}>
+        <button
+          className="text-red-500 font-bold"
+          onClick={() => {
+            dispatch(logout());
+            navigate("/login");
+          }}
+        >
           <LogoutOutlined /> Logout
         </button>
       ),
@@ -114,55 +120,71 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
   return (
-    <Layout style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }} className={darkMode ? 'dark' : ''}>
-        <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
-
-      <Sider className="bg-dark-blue" style={{ background: "#262633",boxShadow: '5px 0 5px -2px rgba(0, 0, 0, 0.5)' }}>
-        <div className="text-2xl text-white text-center mt-4 mb-8 font-bold">
-          EarningEdge<span className="text-[#637CFF]">.</span>
-
-        </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          onClick={({ key }) => {
-            const item = menuItems.find(
-              (item: any) =>
-                item.key === key ||
-                (item.children && item.children.some((child: any) => child.key === key))
-            );
-            if (item) handleMenuClick(item);
+    <Layout
+      style={{ maxHeight: "100vh", minHeight: "100vh", overflow: "hidden" }}
+      className={darkMode ? "dark" : ""}
+    >
+      <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
+        <Sider
+          className="bg-dark-blue"
+          style={{
+            background: "#262633",
+            boxShadow: "5px 0 5px -2px rgba(0, 0, 0, 0.5)",
+            height:"100%"
           }}
-          style={{ background: "#262633" }}
         >
-          {renderMenuItems(menuItems)}
-        </Menu>
-      </Sider>
+          <div className="text-xl text-white text-center mt-4 mb-8 font-bold">
+            EarningEdge<span className="text-[#637CFF]">.in</span>
+          </div>
+          <Menu
+            
+            theme="dark"
+            mode="inline"
+            selectedKeys={[location.pathname]}
+            onClick={({ key }) => {
+              const item = menuItems.find(
+                (item: any) =>
+                  item.key === key ||
+                  (item.children &&
+                    item.children.some((child: any) => child.key === key))
+              );
+              if (item) handleMenuClick(item);
+            }}
+            style={{ background: "#262633",minHeight:"100vh" }}
+          >
+            {renderMenuItems(menuItems)}
+          </Menu>
+        </Sider>
 
-      <Layout>
-        <Header className="flex justify-end items-center pr-4 dark:bg-dark-blue bg-white">
-
-          {/* <Switch
+        <Layout>
+          <Header className="flex justify-end items-center pr-4 dark:bg-dark-blue bg-white">
+            {/* <Switch
             checkedChildren={<SunOutlined />}
             unCheckedChildren={<MoonOutlined />}
             checked={darkMode}
             onChange={() => dispatch(toggleDarkMode())}
           /> */}
-          <Dropdown menu={{ items }} trigger={["click"]} className="cursor-pointer">
-            <Avatar size={40} src={user.profile_image_url || "/avatar.png"} />
-          </Dropdown>
-        </Header>
-        <Content style={{ overflowY: "scroll" }} className="bg-white dark:bg-dark-blue dark:text-white ">
-          <div style={{ minHeight: 360 }}>{children}</div>
-        </Content>
-      </Layout>
+            <Dropdown
+              menu={{ items }}
+              trigger={["click"]}
+              className="cursor-pointer"
+            >
+              <Avatar size={40} src={user.profile_image_url || "/avatar.png"} />
+            </Dropdown>
+          </Header>
+          <Content
+            style={{ overflowY: "scroll" }}
+            className="bg-white dark:bg-dark-blue dark:text-white "
+          >
+            <div style={{ minHeight: 360 }}>{children}</div>
+          </Content>
+        </Layout>
 
-      <EditProfile
-        isModalOpen={isModalOpen}
-        handleOk={handleOk}
-        handleCancel={handleCancel}
-      />
+        <EditProfile
+          isModalOpen={isModalOpen}
+          handleOk={handleOk}
+          handleCancel={handleCancel}
+        />
       </ConfigProvider>
     </Layout>
   );

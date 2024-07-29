@@ -120,6 +120,7 @@ const JournalManagement: React.FC = () => {
   const handleFormSubmit = async (values: any) => {
     const payload = {
       ...values,
+      question:values.title,
       status: true, // Set status to true by default
     };
 
