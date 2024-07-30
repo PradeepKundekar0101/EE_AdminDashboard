@@ -56,7 +56,7 @@ const router = createBrowserRouter([
           { path: "questions", element: <AllQuestions /> },
           { path: "questions/analytics", element: <QuestionsAnalytics /> },
           { path: "journals", element: <Journal /> },
-          { path: "user/:userId", element: <h1 >Hello</h1> },
+          { path: "user/:userId", element: <UserProfile /> },
           { path: "create-mentor", element: <CreateMentor /> },
           { path: "community", element: <CommunityPage /> },
           { path: "live", element: <LivePage /> },
