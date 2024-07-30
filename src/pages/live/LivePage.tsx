@@ -353,7 +353,7 @@ const Live: React.FC = () => {
             >
               <div className="relative p-4 ">
                 <img
-                  src={userData.userProfile || "/avatar.png"}
+                  src={userData.userProfile || "https://global.discourse-cdn.com/turtlehead/original/2X/c/c830d1dee245de3c851f0f88b6c57c83c69f3ace.png"}
                   alt="User Profile"
                   className="h-32 w-32 object-cover  rounded-full"
                 />
