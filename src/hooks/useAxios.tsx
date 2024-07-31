@@ -7,8 +7,8 @@ const useAxios = () => {
     //@ts-ignore
     baseURL:import.meta.env.VITE_BASE_URL,
     headers: {
-       "Content-Type": "multipart/form-data",
-      'Authorization': `Bearer ${token}` || '',
+      "Authorization": `Bearer ${token}` || '',
+       'X-Requested-With': 'XMLHttpRequest'
     },
   });
   instance.interceptors.request.use((config) => {

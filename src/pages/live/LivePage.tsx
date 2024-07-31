@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import  useSupabase  from "../../hooks/useSupabase";
+import useSupabase from "../../hooks/useSupabase";
 import { useAppSelector } from "../../redux/hooks";
 import { Navigate } from "react-router-dom";
 import {
@@ -11,10 +11,8 @@ import {
 } from "../../types/data";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
-import {  Modal, Tag } from "antd";
-import { ExpandOutlined, UserOutlined } from "@ant-design/icons";
+import { Modal, Tag } from "antd";
 import Table, { ColumnsType } from "antd/es/table";
-
 interface UserPositions {
   user: string;
   userProfile: string;
@@ -27,7 +25,8 @@ interface UserPositions {
   totalTradesSold: number;
   netTrades: number;
   totalTradeValue: number;
-  balance:number;
+  balance: number;
+  allPositionsClosed:boolean;
 }
 
 const Live: React.FC = () => {
@@ -48,7 +47,9 @@ const Live: React.FC = () => {
       title: "Position Type",
       dataIndex: "positionType",
       key: "positionType",
-      render:(text)=><Tag color={text=="CLOSED"?"orange":"blue"}>{text}</Tag>
+      render: (text) => (
+        <Tag color={text == "CLOSED" ? "orange" : "blue"}>{text}</Tag>
+      ),
     },
     {
       title: "Buy Qty",
@@ -64,6 +65,11 @@ const Live: React.FC = () => {
       title: "Net Qty",
       dataIndex: "netQty",
       key: "netQty",
+    },
+    {
+      title: "Buy Average Price",
+      dataIndex: "buyAvg",
+      key: "buyAvg",
     },
     {
       title: "Realized Profit",
@@ -158,14 +164,13 @@ const Live: React.FC = () => {
 
     data.forEach((position) => {
       const userId = position.user_id as string;
-      console.log(position.profile_image_url);
       if (!groupedData[userId]) {
         groupedData[userId] = {
-          balance:position.balance,
+          balance: position.balance,
           user: userId,
           userFirstName: position.user_firstname || "",
           userLastName: position.user_lastname || "",
-          userProfile: position.profile_image_url || "/avatar.png",
+          userProfile: position.profile_image_url && position.profile_image_url.split("/")[position.profile_image_url.split("/").length-1]!==null ? position.profile_image_url: "/avatar.png",
           mentorId: position.mentor_id,
           positions: [],
           PnL: 0,
@@ -173,6 +178,8 @@ const Live: React.FC = () => {
           totalTradesSold: 0,
           netTrades: 0,
           totalTradeValue: 0,
+          allPositionsClosed: true, 
+
         };
       }
       const mappedPosition: IPosition = {
@@ -207,6 +214,9 @@ const Live: React.FC = () => {
         crossCurrency: position.cross_currency,
       };
       groupedData[userId].positions.push(mappedPosition);
+      if (mappedPosition.positionType !== "CLOSED") {
+        groupedData[userId].allPositionsClosed = false;
+      }
       //   groupedData[userId].PnL= mappedPosition.positionType=="CLOSED"? groupedData[userId].PnL+mappedPosition.realizedProfit: groupedData[userId].PnL+ mappedPosition.realizedProfit + mappedPosition.unrealizedProfit;
       groupedData[userId].PnL +=
         mappedPosition.realizedProfit + mappedPosition.unrealizedProfit;
@@ -255,7 +265,6 @@ const Live: React.FC = () => {
         drvOptionType: newPosition.drv_option_type as OptionType,
         drvStrikePrice: newPosition.drv_strike_price,
         crossCurrency: newPosition.cross_currency,
-        
       };
 
       const userIndex = newData.findIndex(
@@ -264,18 +273,19 @@ const Live: React.FC = () => {
 
       if (eventType === "INSERT" && userIndex === -1) {
         newData.push({
-            user: mappedPosition.userId,
-            userFirstName: newPosition.user_firstname || "",
-            userLastName: newPosition.user_lastname || "",
-            userProfile: newPosition.profile_image_url || "",
-            mentorId: newPosition.mentor_id,
-            positions: [mappedPosition],
-            PnL: 0,
-            totalTradesBrought: 0,
-            totalTradesSold: 0,
-            netTrades: 0,
-            totalTradeValue: 0,
-            balance:newPosition?.balance,
+          user: mappedPosition.userId,
+          userFirstName: newPosition.user_firstname || "",
+          userLastName: newPosition.user_lastname || "",
+          userProfile: newPosition.profile_image_url || "",
+          mentorId: newPosition.mentor_id,
+          positions: [mappedPosition],
+          PnL: 0,
+          totalTradesBrought: 0,
+          totalTradesSold: 0,
+          netTrades: 0,
+          totalTradeValue: 0,
+          balance: newPosition?.balance,
+          allPositionsClosed: mappedPosition.positionType === "CLOSED",
         });
       } else if (userIndex !== -1) {
         const positionIndex = newData[userIndex].positions.findIndex(
@@ -307,6 +317,7 @@ const Live: React.FC = () => {
             0
           );
         } else if (eventType === "DELETE") {
+          
           if (positionIndex !== -1) {
             newData[userIndex].positions.splice(positionIndex, 1);
             // Update PnL and totalTrades after deletions
@@ -315,6 +326,12 @@ const Live: React.FC = () => {
                 total + (pos.realizedProfit + pos.unrealizedProfit),
               0
             );
+
+            if (newData[userIndex].positions.length > 0) {
+              newData[userIndex].allPositionsClosed = newData[userIndex].positions.every(
+                (pos) => pos.positionType === "CLOSED"
+              );
+            }
 
             newData[userIndex].totalTradeValue = newData[
               userIndex
@@ -339,90 +356,137 @@ const Live: React.FC = () => {
       return newData;
     });
   };
+  const sortByPnL = (a: UserPositions, b: UserPositions) => Math.abs(b.PnL) - Math.abs(a.PnL);
+  const inLoss = liveData.filter(user => user.PnL < 0).sort(sortByPnL);
+  const inProfit = liveData.filter(user => user.PnL >= 0).sort(sortByPnL);
 
   return (
     <CustomLayout>
-      <div>
-        <h1 className=" text-3xl font-semibold px-5 py-4">Live Positions</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">{
-          liveData.length==0 && <h1>No Positions Available now</h1>}
-          {liveData.map((userData) => (
-            <div
-              key={userData.user}
-              className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105"
-            >
-              <div className="relative p-4 ">
-                <img
-                  src={userData.userProfile || "/avatar.png"}
-                  alt="User Profile"
-                  className="h-32 w-32 object-cover  rounded-full"
-                />
+     <div>
+  <h1 className="text-3xl font-semibold px-5 py-4">Live Positions</h1>
+  
+  {liveData.length === 0 && <h1 className="px-6">No Positions Available now</h1>}
+  
+  {inLoss.length > 0 && (
+    <div>
+      <h2 className="text-2xl font-semibold px-5 py-2 text-red-600">In Loss</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-6 py-2">
+        {inLoss.map((userData) => (
+          <div
+            onClick={() => showModal(userData)}
+            key={userData.user}
+            className="cursor-pointer relative overflow-visible rounded-lg border-[0.4px] shadow-lg  border-red-600  transition-transform duration-300 hover:scale-105 bg-red-50 "
+            // style={{
+            //   backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/down.jpg")'
+            // }}
+          >
+            {userData.allPositionsClosed && (
+              <div className="absolute top-[-10px] h-7 w-7 right-[-10px]  flex items-center justify-center bg-orange-400 border-orange-500 border-[0.3px] text-white px-2 py-1 rounded-full text-[5px] font-bold">
+                CLOSED
               </div>
-              <div className="p-4 pt-0">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-                  {userData.userFirstName} {userData.userLastName}
-                </h2>
-                <div className="text-sm text-gray-600 space-y-2">
-                  <p className="flex justify-between">
-                    <span>P&L:</span>
-                    <span
-                      className={`font-medium ${
-                        userData.PnL >= 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      ₹{userData.PnL.toFixed(2)}
-                    </span>
-                  </p>
-                  {/* <p className="flex justify-between">
-                    <span>Trades Brought:</span>
-                    <span className="font-medium">
-                      {userData.totalTradesBrought}
-                    </span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>Trades Sold:</span>
-                    <span className="font-medium">
-                      {userData.totalTradesSold}
-                    </span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>Net Trades:</span>
-                    <span className="font-medium">{userData.netTrades}</span>
-                  </p> */}
-                  <p className="flex justify-between ">
-                    <span>Total Trade Value:</span>
-                    <span className="font-medium">
-                      ₹{userData.totalTradeValue.toLocaleString()}
-                    </span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span>Capital Balance:</span>
-                    <span className="font-medium">
-                      ₹{userData?.balance?.toLocaleString()}
-                    </span>
-                  </p>
-                </div>
-              </div>
-              <div className="px-4 py-3 bg-gray-100 flex  flex-wrap">
-              <button
-                  className="w-full bg-white mb-2 hover:bg-blue-600 text-blue-500 font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
-                  onClick={() => showModal(userData)}
-                >
-                  <UserOutlined className="mr-2" />
-                  Visit profile
-                </button>
-                <button
-                  className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
-                  onClick={() => showModal(userData)}
-                >
-                  <ExpandOutlined className="mr-2" />
-                  View positions
-                </button>
+            )}
+            <div className="relative p-4 flex items-center justify-between">
+              <img
+                src={
+                  ((userData.userProfile) && (userData.userProfile.split("/")[userData.userProfile.split("/").length-1]!==null)) 
+                    ? userData.userProfile
+                    : "https://global.discourse-cdn.com/turtlehead/original/2X/c/c830d1dee245de3c851f0f88b6c57c83c69f3ace.png"
+                }
+                alt="User Profile"
+                className="h-10 w-10 object-cover rounded-full"
+              />
+              <h2 className="text-lg font-semibold text-black mb-2">
+                {userData.userFirstName} {userData.userLastName}
+              </h2>
+            </div>
+            <div className="p-4 pt-0">
+              <div className="text-sm text-black space-y-2">
+                <p className="flex justify-between">
+                  <span>P&L:</span>
+                  <span className="font-medium text-red-600">
+                    ₹{userData.PnL.toFixed(2)}
+                  </span>
+                </p>
+                <p className="flex justify-between">
+                  <span>Total Trade Value:</span>
+                  <span className="font-medium">
+                    ₹{userData.totalTradeValue.toLocaleString()}
+                  </span>
+                </p>
+                <p className="flex justify-between">
+                  <span>Capital Balance:</span>
+                  <span className="font-medium">
+                    ₹{userData?.balance?.toLocaleString()}
+                  </span>
+                </p>
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
+    </div>
+  )}
+  
+  {inProfit.length > 0 && (
+    <div>
+      <h2 className="text-2xl font-semibold px-5 py-2 text-green-600">In Profit</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 px-6 py-2">
+        {inProfit.map((userData) => (
+          <div
+            onClick={() => showModal(userData)}
+            key={userData.user}
+            className="cursor-pointer rounded-lg relative rounded- overflow-visible shadow-lg  transition-transform duration-300 hover:scale-105 bg-green-50 border-[0.7px] border-green-600 bg-opacity-90"
+            // style={{
+            //   backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("/up.jpg")'
+            // }}
+          >
+            {userData.allPositionsClosed && (
+              <div className="absolute top-[-10px] h-7 w-7 right-[-10px] flex items-center justify-center bg-orange-400 border-orange-500 border-[0.3px] text-white px-2 py-1 rounded-full text-[5px] font-bold">
+                CLOSED
+              </div>
+            )}
+            <div className="relative p-4 flex items-center justify-between">
+              <img
+                src={
+                  ((userData.userProfile) && (userData.userProfile.split("/")[userData.userProfile.split("/").length-1]!==null)) 
+                    ? userData.userProfile
+                    : "https://global.discourse-cdn.com/turtlehead/original/2X/c/c830d1dee245de3c851f0f88b6c57c83c69f3ace.png"
+                }
+                alt="User Profile"
+                className="h-10 w-10 object-cover rounded-full"
+              />
+              <h2 className="text-lg font-semibold text-black mb-2">
+                {userData.userFirstName} {userData.userLastName}
+              </h2>
+            </div>
+            <div className="p-4 pt-0">
+              <div className="text-sm text-black space-y-2">
+                <p className="flex justify-between">
+                  <span>P&L:</span>
+                  <span className="font-medium text-green-600">
+                    ₹{userData.PnL.toFixed(2)}
+                  </span>
+                </p>
+                <p className="flex justify-between">
+                  <span>Total Trade Value:</span>
+                  <span className="font-medium">
+                    ₹{userData.totalTradeValue.toLocaleString()}
+                  </span>
+                </p>
+                <p className="flex justify-between">
+                  <span>Capital Balance:</span>
+                  <span className="font-medium">
+                    ₹{userData?.balance?.toLocaleString()}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</div>
       <Modal
         title={`Positions for ${selectedUser?.userFirstName} ${selectedUser?.userLastName}`}
         visible={isModalVisible}

@@ -1,37 +1,42 @@
 import React from 'react'
 import ReactApexChart from 'react-apexcharts'
+import moment from 'moment'
 
 interface AreaChartProps {
   data: { name: string; data: number[] }[]
   categories: string[]
   title: string
   colors: string[]
-  darkMode?:boolean,
-  style?:any
+  darkMode?: boolean
 }
 
 const AreaChart: React.FC<AreaChartProps> = ({
   data,
   categories,
-  title,
   colors,
   darkMode
 }) => {
   const options = {
     chart: {
       type: 'area',
-      height: 350
+      height: 300,
+      toolbar: {
+        show: false
+      }
     },
     dataLabels: {
       enabled: false
     },
     stroke: {
-      curve: 'smooth'
+      curve: 'smooth',
+      width: 2
     },
     xaxis: {
-      categories: categories,
+      categories: categories.map(date => moment(date).format('D MMM')),
       labels: {
-        show: false
+        style: {
+          colors: darkMode ? '#fff' : '#000',
+        }
       },
       axisBorder: {
         show: false
@@ -42,13 +47,9 @@ const AreaChart: React.FC<AreaChartProps> = ({
     },
     yaxis: {
       labels: {
-        show: false
-      },
-      axisBorder: {
-        show: false
-      },
-      axisTicks: {
-        show: false
+        style: {
+          colors: darkMode ? '#fff' : '#000',
+        }
       }
     },
     grid: {
@@ -56,26 +57,19 @@ const AreaChart: React.FC<AreaChartProps> = ({
     },
     tooltip: {
       x: {
-        format: 'dd/MM/yy'
+        format: 'dd MMM'
       }
     },
-    // fill: {
-    //     type: "gradient",
-    //     gradient: {
-    //       shadeIntensity: 1,
-    //       opacityFrom: 0.9,
-    //       opacityTo: 0.9,
-    //       stops: [0, 60, 100]
-    //     }
-    //   },
+    fill: {
+      type: 'gradient',
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.7,
+        opacityTo: 0.3,
+        stops: [0, 90, 100]
+      }
+    },
     colors: colors,
-    title: {
-      text: title,
-      align: 'left',
-      style: {
-        color: darkMode ? '#fff' : '#000',
-      }
-    },
     legend: {
       labels: {
         colors: darkMode ? '#ffffff' : '#000000'
@@ -84,13 +78,13 @@ const AreaChart: React.FC<AreaChartProps> = ({
   }
 
   return (
-    <div className='p-4'>
+    <div className='flex-1'>
       <ReactApexChart
         //@ts-ignore
         options={options}
         series={data}
         type='area'
-        height={350}
+        height="100%"
       />
     </div>
   )

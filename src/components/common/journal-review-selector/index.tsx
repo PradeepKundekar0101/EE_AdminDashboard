@@ -8,7 +8,7 @@ export const ReviewTypeSelector = ({handleFilterChange}:{handleFilterChange:any}
       {
         label: (
           <span className="flex items-center">
-            <span className="w-2 h-2 bg-slate-600 rounded-full mr-2"></span>
+            {/* <span className="w-2 h-2 bg-slate-600 rounded-full mr-2"></span> */}
             All
           </span>
         ),
@@ -17,7 +17,7 @@ export const ReviewTypeSelector = ({handleFilterChange}:{handleFilterChange:any}
       {
         label: (
           <span className="flex items-center">
-            <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+            {/* <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span> */}
             Reviewed
           </span>
         ),
@@ -26,7 +26,7 @@ export const ReviewTypeSelector = ({handleFilterChange}:{handleFilterChange:any}
       {
         label: (
           <span className="flex items-center">
-            <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+            {/* <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span> */}
             Pending
           </span>
         ),
