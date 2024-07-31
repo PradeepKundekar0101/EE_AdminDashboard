@@ -18,7 +18,7 @@ import CustomTable from '../../components/common/table/CustomTable'
 import CustomLayout from '../../components/layout/custom-layout/CustomLayout'
 import useFetchData from '../../hooks/useFetchData'
 import { useAppSelector } from '../../redux/hooks'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
@@ -40,8 +40,6 @@ const schema = yup
   .object({
     review: yup.string().required('Review is required').min(4).max(1000),
     rating: yup.number().required('Rating is required')
-    // .min(0, 'Minumum rating is 0')
-    // .max(0, 'Max rating is 5'),
   })
   .required()
 
@@ -49,7 +47,6 @@ const lightTheme = {
   token: {
     colorBgBase: '#ffffff',
     colorText: '#000000',
-    // Add more tokens as needed
   }
 }
 
@@ -97,7 +94,7 @@ const Journal = () => {
     searchTerm: '',
     journalType: '',
     reviewStatus: '',
-    dateRange: ['', '']
+    dateRange: [dayjs().format("YYYY-MM-DD"), dayjs().format("YYYY-MM-DD")]
   })
 
   const {
@@ -115,7 +112,7 @@ const Journal = () => {
     // error,
     fetchData
   } = useFetchData<any>(
-    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${moment(filters.dateRange[1]).add(1,"day").format("YYYY-MM-DD")}`
+    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${dayjs(filters.dateRange[1]).add(1,"day").format("YYYY-MM-DD")}`
   )
 
   useEffect(() => {
@@ -172,11 +169,11 @@ const Journal = () => {
       render: (_: string, record: any) => {
         return (
           <div>
-            <h1>
+            <Link to={`/${user.role}/user/${record?.userId?._id}`}>
               {record?.userId?.firstName
-                ? record?.userId?.firstName
+                ? record?.userId?.firstName+" "+record?.userId?.lastName
                 : "Couldn't fetch name"}
-            </h1>
+            </Link>
           </div>
         )
       }
@@ -257,6 +254,7 @@ const Journal = () => {
               <JournalTypeSelector handleFilterChange={handleFilterChange} />
               <ReviewTypeSelector handleFilterChange={handleFilterChange} />
               <RangePicker
+                defaultValue={[dayjs(),dayjs()]}
                 disabledDate={current =>
                   current && current > moment().endOf('day')
                 }

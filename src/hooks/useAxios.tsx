@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAppSelector } from '../redux/hooks'
 const useAxios = () => {
   const token  = useAppSelector((state) => {return state.auth.token});
-  console.log(token)
+
   const instance = axios.create({
     //@ts-ignore
     baseURL:import.meta.env.VITE_BASE_URL,
