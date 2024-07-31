@@ -35,7 +35,7 @@ import { ReviewTypeSelector } from '../../components/common/journal-review-selec
 import JournalModal from '../../components/common/journal-modal/JournalModal'
 
 interface IFormInput {
-  review: string
+  review: string 
   rating: number
 }
 const schema = yup
