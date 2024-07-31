@@ -40,7 +40,7 @@ const JournalManagement: React.FC = () => {
   const [form] = Form.useForm();
   const axiosInstance = useAxios();
 
-  const token = localStorage.getItem("token");
+  const token = useAppSelector((state)=>state.auth.token)
   console.log("token: ", token);
 
   useEffect(() => {
@@ -120,6 +120,7 @@ const JournalManagement: React.FC = () => {
   const handleFormSubmit = async (values: any) => {
     const payload = {
       ...values,
+      question:values.title,
       status: true, // Set status to true by default
     };
 
@@ -249,7 +250,7 @@ const JournalManagement: React.FC = () => {
       >
         <Form form={form} layout="vertical" onFinish={handleFormSubmit}>
           <Form.Item
-            name="question"
+            name="title"
             label="Question Title"
             rules={[{ required: true }]}
           >

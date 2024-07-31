@@ -63,25 +63,20 @@ const RecentTradesTable = ({ userId }: { userId: string }) => {
   const [activeTab, setActiveTab] = useState<"Holdings" | "Positions">(
     "Holdings"
   );
-  // const [refreshKey, setRefreshKey] = useState(0);
 
   const {
     data: holdings,
     error: holdingsError,
     loading: holdingsLoading,
-    fetchData:reloadHoldingData
+    fetchData: reloadHoldingData,
   } = useFetchData<any>(`/broker/getHoldingsAdmin/${userId}`);
 
   const {
     data: positions,
     error: positionsError,
     loading: positionsLoading,
-    fetchData:reloadPositionData
+    fetchData: reloadPositionData,
   } = useFetchData<any>(`/broker/getPositionsAdmin/${userId}`);
-
-  // const handleRefresh = () => {
-  //   setRefreshKey((prevKey) => prevKey + 1);
-  // };
 
   const handleTabChange = (value: "Holdings" | "Positions") => {
     setActiveTab(value);
@@ -103,43 +98,47 @@ const RecentTradesTable = ({ userId }: { userId: string }) => {
 
   return (
     <ConfigProvider>
-
-    
-    <div className="w-full">
-      <div className="w-full flex justify-start space-x-2 items-center mb-4">
-     
+      <div className="w-full">
+        <div className="w-full flex justify-start space-x-2 items-center mb-4">
           <Segmented
-            
             value={activeTab}
             onChange={(value) =>
               handleTabChange(value as "Holdings" | "Positions")
             }
             options={["Holdings", "Positions"]}
           />
-     
-        <Button onClick={()=>{activeTab==="Holdings"?reloadHoldingData():reloadPositionData()}} icon={<ReloadOutlined />} >
-          Refresh
-        </Button>
-      </div>
 
-      <Card title={activeTab}>
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <Spin size="large" />
-          </div>
-        ) : (
-          <Table
-            columns={columns}
-            dataSource={tableData}
-            pagination={{
-              pageSize: 5,
-              position: ["bottomCenter"],
-              showQuickJumper: true,
+          <Button
+            onClick={() => {
+              activeTab === "Holdings"
+                ? reloadHoldingData()
+                : reloadPositionData();
             }}
-          />
-        )}
-      </Card>
-    </div>
+            icon={<ReloadOutlined />}
+          >
+            Refresh
+          </Button>
+        </div>
+
+        <Card title={activeTab}>
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <Spin size="large" />
+            </div>
+          ) : (
+            <Table
+            
+              columns={columns}
+              dataSource={tableData}
+              pagination={{
+                pageSize: 5,
+                position: ["bottomCenter"],
+                showQuickJumper: true,
+              }}
+            />
+          )}
+        </Card>
+      </div>
     </ConfigProvider>
   );
 };

@@ -19,7 +19,7 @@ import CustomTable from '../../components/common/table/CustomTable'
 import CustomLayout from '../../components/layout/custom-layout/CustomLayout'
 import useFetchData from '../../hooks/useFetchData'
 import { useAppSelector } from '../../redux/hooks'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import moment from 'moment'
 import { useEffect, useState } from 'react'
 import { Controller, SubmitHandler, useForm } from 'react-hook-form'
@@ -42,16 +42,13 @@ const schema = yup
   .object({
     review: yup.string().required('Review is required').min(4).max(1000),
     rating: yup.number().required('Rating is required')
-    // .min(0, 'Minumum rating is 0')
-    // .max(0, 'Max rating is 5'),
   })
   .required()
 
 const lightTheme = {
   token: {
     colorBgBase: '#ffffff',
-    colorText: '#000000'
-    // Add more tokens as needed
+    colorText: '#000000',
   }
 }
 
@@ -99,7 +96,7 @@ const Journal = () => {
     searchTerm: '',
     journalType: '',
     reviewStatus: '',
-    dateRange: ['', '']
+    dateRange: [dayjs().format("YYYY-MM-DD"), dayjs().format("YYYY-MM-DD")]
   })
   const [isModalVisible, setIsModalVisible] = useState(false)
   const handleButtonClick = () => {
@@ -125,7 +122,7 @@ const Journal = () => {
     // error,
     fetchData
   } = useFetchData<any>(
-    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${filters.dateRange[1]}`
+    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${dayjs(filters.dateRange[1]).add(1,"day").format("YYYY-MM-DD")}`
   )
 
   useEffect(() => {
@@ -182,11 +179,11 @@ const Journal = () => {
       render: (_: string, record: any) => {
         return (
           <div>
-            <h1>
+            <Link to={`/${user.role}/user/${record?.userId?._id}`}>
               {record?.userId?.firstName
-                ? record?.userId?.firstName
+                ? record?.userId?.firstName+" "+record?.userId?.lastName
                 : "Couldn't fetch name"}
-            </h1>
+            </Link>
           </div>
         )
       }
@@ -283,6 +280,7 @@ const Journal = () => {
               <JournalTypeSelector handleFilterChange={handleFilterChange} />
               <ReviewTypeSelector handleFilterChange={handleFilterChange} />
               <RangePicker
+                defaultValue={[dayjs(),dayjs()]}
                 disabledDate={current =>
                   current && current > moment().endOf('day')
                 }
@@ -315,20 +313,21 @@ const Journal = () => {
             <div className='border-b-[0.5px] border-slate-300 mb-3 dark:border-gray-700'>
               <div className='flex justify-between'>
                 <h1 className='text-xl dark:text-white'>Journal</h1>
-                <Flex>
-                  <Button className='mr-3' onClick={handleButtonClick}>
-                    Get Data
-                  </Button>
-                  <JournalModal
-                    userId={userId}
-                    selectedValue={formatDate(selectedJournal?.updatedAt)}
-                    isVisible={isModalVisible}
-                    onClose={handleCancel}
-                  />
-                  {selectedJournal?.reviewId ? (
-                    <Tag
-                      color='green'
-                      className='flex items-center dark:bg-green-800'
+                {selectedJournal?.reviewId ? (
+                  <Tag
+                    color='green'
+                    className='flex items-center dark:bg-green-800'
+                  >
+                    {'Reviewed By ' + selectedJournal?.review.reviewerId}
+                  </Tag>
+                ) : (
+                  <div>
+                    <span className='text-orange-500'>Review pending </span>
+                    <Button
+                      onClick={() => {
+                        setShowAddReviewDrawer(true)
+                      }}
+                      className='dark:bg-gray-800 dark:text-white'
                     >
                       {'Reviewed By ' + selectedJournal?.review.userId}
                     </Tag>

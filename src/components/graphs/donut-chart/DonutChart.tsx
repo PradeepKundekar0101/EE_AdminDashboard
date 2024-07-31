@@ -45,7 +45,7 @@ const DonutChart: React.FC<DonutChartProps> = ({ data, labels, title, colors, da
     <div className="p-4">
       <ReactApexChart
       //@ts-ignore
-      options={options} series={data} type="donut" height={350} />
+      options={options} series={data} type="donut" height={300} />
     </div>
   );
 };
