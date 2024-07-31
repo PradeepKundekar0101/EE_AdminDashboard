@@ -11,7 +11,8 @@ import {
   message,
   Upload,
   DatePicker,
-  ConfigProvider
+  ConfigProvider,
+  Flex
 } from 'antd'
 
 import CustomTable from '../../components/common/table/CustomTable'
@@ -31,6 +32,7 @@ import { UploadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { JournalTypeSelector } from '../../components/common/journal-type-selector'
 import { ReviewTypeSelector } from '../../components/common/journal-review-selector'
+import JournalModal from '../../components/common/journal-modal/JournalModal'
 
 interface IFormInput {
   review: string
@@ -59,8 +61,8 @@ const darkTheme = {
     fill: '#ffffff',
     itemActiveBg: '#ffffff',
     itemColor: '#ffffff',
-    itemHoverBg: '#ffffff',
-    
+    itemHoverBg: '#ffffff'
+
     // Add more tokens as needed
   }
 }
@@ -86,7 +88,7 @@ const Journal = () => {
   const [showSideDrawer, setShowSideDrawer] = useState(false)
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false)
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null)
-
+  
   const [fileList, setFileList] = useState<any[]>([])
   const { RangePicker } = DatePicker
 
@@ -96,6 +98,14 @@ const Journal = () => {
     reviewStatus: '',
     dateRange: [dayjs().format("YYYY-MM-DD"), dayjs().format("YYYY-MM-DD")]
   })
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const handleButtonClick = () => {
+    setIsModalVisible(true)
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false)
+  }
 
   const {
     // data,
@@ -236,10 +246,26 @@ const Journal = () => {
   }
 
   const darkMode = useAppSelector(state => state.theme.darkMode)
+  const userId = user?._id;
+  function formatDate(originalDate: string): string {
+    const date = new Date(originalDate);
+    
+    // Get the year
+    const year = date.getFullYear();
+    
+    // Get the month and pad it with a leading zero if necessary
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    
+    // Get the day and pad it with a leading zero if necessary
+    const day = String(date.getDate()).padStart(2, '0'); // Days are 1-indexed
+    
+    // Return the formatted date string
+    return `${year}-${month}-${day}`;
+  }
 
   return (
     <CustomLayout>
-      <div className='px-10 dark:bg-dark-blue bg-white'>
+      <div className='px-10'>
         <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
           <div className='flex w-full justify-between py-7'>
             <Input.Search
@@ -303,10 +329,22 @@ const Journal = () => {
                       }}
                       className='dark:bg-gray-800 dark:text-white'
                     >
-                      Add Review
-                    </Button>
-                  </div>
-                )}
+                      {'Reviewed By ' + selectedJournal?.review.userId}
+                    </Tag>
+                  ) : (
+                    <div className='flex flex-col'>
+                      <Button
+                        onClick={() => {
+                          setShowAddReviewDrawer(true)
+                        }}
+                        className='dark:bg-gray-800 dark:text-white'
+                      >
+                        Add Review
+                      </Button>
+                      <span className='text-orange-500'>Review pending </span>
+                    </div>
+                  )}
+                </Flex>
               </div>
               {selectedJournal && (
                 <List

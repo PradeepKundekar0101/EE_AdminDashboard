@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Calendar, Card, Modal, Collapse } from "antd";
 import dayjs, { Dayjs } from "dayjs";
@@ -59,6 +60,7 @@ const CustomCalendar: React.FC<CalendarProps> = ({ userId, dailyEntries ,onMonth
   }, [apiResponse]);
 
   const handleDateClick = (value: Dayjs) => {
+    console.log('value: ', value.format('YYYY-MM-DD'));
     setSelectedValue(value);
     setIsModalVisible(true);
   };
@@ -116,6 +118,7 @@ const CustomCalendar: React.FC<CalendarProps> = ({ userId, dailyEntries ,onMonth
           dateFullCellRender={dateCellRender}
         />
       </Card>
+
       <Modal
         title="Daily Journaling"
         visible={isModalVisible}
