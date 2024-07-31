@@ -130,7 +130,7 @@ const CustomCalendar: React.FC<CalendarProps> = ({ userId, dailyEntries ,onMonth
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div className="p-4 border rounded-lg">
               <div className="text-lg">Profit and Loss</div>
-              <div className= {summaryData?.data?.data?.totalPnL || 0 >=0?"text-green-600 text-2xl font-bold":"text-red-600 text-2xl font-bold"}>{summaryData?.data.data.totalPnL}</div>
+              <div className= {summaryData?.data?.data?.totalPnL.toFixed(0) || 0 >=0?"text-green-600 text-2xl font-bold":"text-red-600 text-2xl font-bold"}>{summaryData?.data.data.totalPnL}</div>
             </div>
             <div className="p-4 border rounded-lg">
               <div className="text-lg">Total Trades</div>

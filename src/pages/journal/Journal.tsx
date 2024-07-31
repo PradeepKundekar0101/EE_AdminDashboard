@@ -115,7 +115,7 @@ const Journal = () => {
     // error,
     fetchData
   } = useFetchData<any>(
-    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${filters.dateRange[1]}`
+    `journal/all/${user.role}?searchTerm=${filters.searchTerm}&type=${filters.journalType}&reviewStatus=${filters.reviewStatus}&fromDate=${filters.dateRange[0]}&toDate=${moment(filters.dateRange[1]).add(1,"day").format("YYYY-MM-DD")}`
   )
 
   useEffect(() => {
@@ -294,7 +294,7 @@ const Journal = () => {
                     color='green'
                     className='flex items-center dark:bg-green-800'
                   >
-                    {'Reviewed By ' + selectedJournal?.review.userId}
+                    {'Reviewed By ' + selectedJournal?.review.reviewerId}
                   </Tag>
                 ) : (
                   <div>

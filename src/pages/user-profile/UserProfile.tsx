@@ -54,7 +54,7 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
   }>(
     `/analytics/pnl/single/${userId}?fromDate=${overallPnLdateRange[0].format(
       "YYYY-MM-DD"
-    )}&toDate=${overallPnLdateRange[1].format("YYYY-MM-DD")}`
+    )}&toDate=${overallPnLdateRange[1].add(1,"day").format("YYYY-MM-DD")}`
   );
 
   //Fetch Win Loss data
@@ -66,7 +66,7 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
   const { data: ratingData } = useFetchData<RatingResponse>(
     `/analytics/ratingsTrend/${userId}?fromDate=${ratingsDateRange[0].format(
       "YYYY-MM-DD"
-    )}&toDate=${ratingsDateRange[1].format("YYYY-MM-DD")}`
+    )}&toDate=${ratingsDateRange[1].add(1,"day").format("YYYY-MM-DD")}`
   );
 
   //Fetch Monthly journal entries

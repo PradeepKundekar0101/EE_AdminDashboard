@@ -61,7 +61,7 @@ const AdminDashboard = () => {
   } = useFetchData<{ status: string; data: Entry[] }>(
     `/analytics/journalTypeTrend?fromDate=${journalDateRange[0].format(
       "YYYY-MM-DD"
-    )}&toDate=${journalDateRange[1].format("YYYY-MM-DD")}`
+    )}&toDate=${journalDateRange[1].add(1,"day").format("YYYY-MM-DD")}`
   );
   //FORMATTING the journal response trend data
   const formattedJournalResponseTrendData =
@@ -100,7 +100,7 @@ const AdminDashboard = () => {
   }>(
     `/analytics/pnl/overall?fromDate=${overallPnLdateRange[0].format(
       "YYYY-MM-DD"
-    )}&toDate=${overallPnLdateRange[1].format("YYYY-MM-DD")}`
+    )}&toDate=${overallPnLdateRange[1].add(1,"day").format("YYYY-MM-DD")}`
   );
   const pnlCategories =
     overallPnl?.data?.data?.map((item) => dayjs(item._id).format("DD MMM")) ||

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import  useSupabase  from "../../hooks/useSupabase";
+import useSupabase from "../../hooks/useSupabase";
 import { useAppSelector } from "../../redux/hooks";
 import { Navigate } from "react-router-dom";
 import {
@@ -11,7 +11,7 @@ import {
 } from "../../types/data";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import CustomLayout from "../../components/layout/custom-layout/CustomLayout";
-import {  Modal, Tag } from "antd";
+import { Modal, Tag } from "antd";
 import { ExpandOutlined, UserOutlined } from "@ant-design/icons";
 import Table, { ColumnsType } from "antd/es/table";
 
@@ -27,7 +27,8 @@ interface UserPositions {
   totalTradesSold: number;
   netTrades: number;
   totalTradeValue: number;
-  balance:number;
+  balance: number;
+  allPositionsClosed:boolean;
 }
 
 const Live: React.FC = () => {
@@ -48,7 +49,9 @@ const Live: React.FC = () => {
       title: "Position Type",
       dataIndex: "positionType",
       key: "positionType",
-      render:(text)=><Tag color={text=="CLOSED"?"orange":"blue"}>{text}</Tag>
+      render: (text) => (
+        <Tag color={text == "CLOSED" ? "orange" : "blue"}>{text}</Tag>
+      ),
     },
     {
       title: "Buy Qty",
@@ -158,10 +161,9 @@ const Live: React.FC = () => {
 
     data.forEach((position) => {
       const userId = position.user_id as string;
-      console.log(position.profile_image_url);
       if (!groupedData[userId]) {
         groupedData[userId] = {
-          balance:position.balance,
+          balance: position.balance,
           user: userId,
           userFirstName: position.user_firstname || "",
           userLastName: position.user_lastname || "",
@@ -173,6 +175,8 @@ const Live: React.FC = () => {
           totalTradesSold: 0,
           netTrades: 0,
           totalTradeValue: 0,
+          allPositionsClosed: true, 
+
         };
       }
       const mappedPosition: IPosition = {
@@ -207,6 +211,9 @@ const Live: React.FC = () => {
         crossCurrency: position.cross_currency,
       };
       groupedData[userId].positions.push(mappedPosition);
+      if (mappedPosition.positionType !== "CLOSED") {
+        groupedData[userId].allPositionsClosed = false;
+      }
       //   groupedData[userId].PnL= mappedPosition.positionType=="CLOSED"? groupedData[userId].PnL+mappedPosition.realizedProfit: groupedData[userId].PnL+ mappedPosition.realizedProfit + mappedPosition.unrealizedProfit;
       groupedData[userId].PnL +=
         mappedPosition.realizedProfit + mappedPosition.unrealizedProfit;
@@ -255,7 +262,6 @@ const Live: React.FC = () => {
         drvOptionType: newPosition.drv_option_type as OptionType,
         drvStrikePrice: newPosition.drv_strike_price,
         crossCurrency: newPosition.cross_currency,
-        
       };
 
       const userIndex = newData.findIndex(
@@ -264,18 +270,19 @@ const Live: React.FC = () => {
 
       if (eventType === "INSERT" && userIndex === -1) {
         newData.push({
-            user: mappedPosition.userId,
-            userFirstName: newPosition.user_firstname || "",
-            userLastName: newPosition.user_lastname || "",
-            userProfile: newPosition.profile_image_url || "",
-            mentorId: newPosition.mentor_id,
-            positions: [mappedPosition],
-            PnL: 0,
-            totalTradesBrought: 0,
-            totalTradesSold: 0,
-            netTrades: 0,
-            totalTradeValue: 0,
-            balance:newPosition?.balance,
+          user: mappedPosition.userId,
+          userFirstName: newPosition.user_firstname || "",
+          userLastName: newPosition.user_lastname || "",
+          userProfile: newPosition.profile_image_url || "",
+          mentorId: newPosition.mentor_id,
+          positions: [mappedPosition],
+          PnL: 0,
+          totalTradesBrought: 0,
+          totalTradesSold: 0,
+          netTrades: 0,
+          totalTradeValue: 0,
+          balance: newPosition?.balance,
+          allPositionsClosed: mappedPosition.positionType === "CLOSED",
         });
       } else if (userIndex !== -1) {
         const positionIndex = newData[userIndex].positions.findIndex(
@@ -307,6 +314,7 @@ const Live: React.FC = () => {
             0
           );
         } else if (eventType === "DELETE") {
+          
           if (positionIndex !== -1) {
             newData[userIndex].positions.splice(positionIndex, 1);
             // Update PnL and totalTrades after deletions
@@ -315,6 +323,12 @@ const Live: React.FC = () => {
                 total + (pos.realizedProfit + pos.unrealizedProfit),
               0
             );
+
+            if (newData[userIndex].positions.length > 0) {
+              newData[userIndex].allPositionsClosed = newData[userIndex].positions.every(
+                (pos) => pos.positionType === "CLOSED"
+              );
+            }
 
             newData[userIndex].totalTradeValue = newData[
               userIndex
@@ -344,16 +358,24 @@ const Live: React.FC = () => {
     <CustomLayout>
       <div>
         <h1 className=" text-3xl font-semibold px-5 py-4">Live Positions</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">{
-          liveData.length==0 && <h1>No Positions Available now</h1>}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 p-6">
+          {liveData.length == 0 && <h1>No Positions Available now</h1>}
           {liveData.map((userData) => (
             <div
               key={userData.user}
               className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105"
             >
+              {userData.allPositionsClosed && (
+                <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                  CLOSED
+                </div>
+              )}
               <div className="relative p-4 ">
                 <img
-                  src={userData.userProfile || "https://global.discourse-cdn.com/turtlehead/original/2X/c/c830d1dee245de3c851f0f88b6c57c83c69f3ace.png"}
+                  src={
+                    userData.userProfile ||
+                    "https://global.discourse-cdn.com/turtlehead/original/2X/c/c830d1dee245de3c851f0f88b6c57c83c69f3ace.png"
+                  }
                   alt="User Profile"
                   className="h-32 w-32 object-cover  rounded-full"
                 />
@@ -404,7 +426,7 @@ const Live: React.FC = () => {
                 </div>
               </div>
               <div className="px-4 py-3 bg-gray-100 flex  flex-wrap">
-              <button
+                <button
                   className="w-full bg-white mb-2 hover:bg-blue-600 text-blue-500 font-medium py-2 px-4 rounded-md transition duration-300 ease-in-out flex items-center justify-center"
                   onClick={() => showModal(userData)}
                 >
