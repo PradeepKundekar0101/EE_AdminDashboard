@@ -33,8 +33,8 @@ const darkTheme = {
     itemActiveBg: '#ffffff',
     itemColor: '#ffffff',
     itemHoverBg: '#ffffff',
-    
-    // Add more tokens as needed
+    colorTextDescription: '#D0D0D0',
+    colorIcon: '#ffffff',
   }
 }
 
