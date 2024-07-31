@@ -1,41 +1,19 @@
-import { useState, useEffect } from 'react';
-import { Calendar, Card, Modal, Collapse } from 'antd';
+import { useState } from 'react';
+import { Calendar, Card } from 'antd';
 import dayjs, { Dayjs } from 'dayjs';
-import './Calendar.css';
-import useFetchData from '../../../hooks/useFetchData';
+import JournalModal from '../journal-modal/JournalModal'; // Import the new modal component
 
 interface CalendarProps {
   userId: string;
 }
 
-interface Entry {
-  _id: string;
-  type: string;
-  responses: {
-    question: {
-      title: string;
-    } | null;
-    answer: string;
-  }[];
-}
-
 const CustomCalendar: React.FC<CalendarProps> = ({ userId }) => {
-  const [value, setValue] = useState<Dayjs>(() => dayjs('2024-06-01'));
-  const [selectedValue, setSelectedValue] = useState<Dayjs>(() => dayjs('2024-06-01'));
+  const [value, setValue] = useState<Dayjs>(dayjs); // Default to current date
+  const [selectedValue, setSelectedValue] = useState<Dayjs>(dayjs); // Default to current date
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [entries, setEntries] = useState<Entry[]>([]);
-
-  const { data: apiResponse, loading, error } = useFetchData<{ status: string; data: Entry[] }>(
-    `/journal/singleUser/${userId}?date=${selectedValue.format('YYYY-MM-DD')}`
-  );
-
-  useEffect(() => {
-    if (apiResponse) {
-      setEntries(apiResponse.data);
-    }
-  }, [apiResponse]);
 
   const handleDateClick = (value: Dayjs) => {
+    console.log('value: ', value.format('YYYY-MM-DD'));
     setSelectedValue(value);
     setIsModalVisible(true);
   };
@@ -81,62 +59,12 @@ const CustomCalendar: React.FC<CalendarProps> = ({ userId }) => {
           dateFullCellRender={dateCellRender}
         />
       </Card>
-      <Modal
-        title="Daily Journaling"
-        visible={isModalVisible}
-        onCancel={handleCancel}
-        footer={null}
-      >
-        <div>
-          <div className="text-lg font-bold">
-            {selectedValue.format('ddd, DD MMMM YYYY')}{' '}
-            <span className="text-green-500">P&L: 3000</span>
-          </div>
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <div className="p-4 border rounded-lg">
-              <div className="text-lg">Total Trades</div>
-              <div className="text-2xl font-bold">3</div>
-            </div>
-          <div className="p-4 border rounded-lg">
-              <div className="text-lg">Win rate Percentage</div>
-              <div className="text-2xl font-bold">100%</div>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <div className="text-lg">Losers</div>
-              <div className="text-2xl font-bold">0</div>
-            </div>
-            <div className="p-4 border rounded-lg">
-              <div className="text-lg">Winners</div>
-              <div className="text-2xl font-bold">3</div>
-            </div>
-            </div>
-          <h2 className="text-lg font-bold mt-2">Journal Enteries</h2>
-          {loading && <p>Loading...</p>}
-          {error && <p>Error loading data.</p>}
-          {!loading && !error && entries.length === 0 && (
-            <p>Not able to fetch any questions.</p>
-          )}
-          {!loading && !error && entries.length > 0 && (
-            <div>
-              {entries.map((entry) => (
-                <div key={entry._id} className="p-1 rounded-lg">
-                  <div className="font-bold">{entry.type || 'Type not available'}</div>
-                  <Collapse accordion>
-                    {entry.responses.map((response, index) => (
-                      <Collapse.Panel
-                        header={response.question?.title || 'Title not available'}
-                        key={index}
-                      >
-                        <p>{response.answer || 'Answer not available'}</p>
-                      </Collapse.Panel>
-                    ))}
-                  </Collapse>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </Modal>
+      <JournalModal
+        userId={userId}
+        selectedValue={selectedValue}
+        isVisible={isModalVisible}
+        onClose={handleCancel}
+      />
     </div>
   );
 };
