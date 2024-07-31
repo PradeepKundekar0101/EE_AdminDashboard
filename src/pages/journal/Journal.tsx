@@ -11,7 +11,8 @@ import {
   message,
   Upload,
   DatePicker,
-  ConfigProvider
+  ConfigProvider,
+  Flex
 } from 'antd'
 
 import CustomTable from '../../components/common/table/CustomTable'
@@ -31,6 +32,7 @@ import { UploadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { JournalTypeSelector } from '../../components/common/journal-type-selector'
 import { ReviewTypeSelector } from '../../components/common/journal-review-selector'
+import JournalModal from '../../components/common/journal-modal/JournalModal'
 
 interface IFormInput {
   review: string
@@ -48,7 +50,7 @@ const schema = yup
 const lightTheme = {
   token: {
     colorBgBase: '#ffffff',
-    colorText: '#000000',
+    colorText: '#000000'
     // Add more tokens as needed
   }
 }
@@ -62,8 +64,8 @@ const darkTheme = {
     fill: '#ffffff',
     itemActiveBg: '#ffffff',
     itemColor: '#ffffff',
-    itemHoverBg: '#ffffff',
-    
+    itemHoverBg: '#ffffff'
+
     // Add more tokens as needed
   }
 }
@@ -89,7 +91,7 @@ const Journal = () => {
   const [showSideDrawer, setShowSideDrawer] = useState(false)
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false)
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null)
-
+  
   const [fileList, setFileList] = useState<any[]>([])
   const { RangePicker } = DatePicker
 
@@ -99,6 +101,14 @@ const Journal = () => {
     reviewStatus: '',
     dateRange: ['', '']
   })
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const handleButtonClick = () => {
+    setIsModalVisible(true)
+  }
+
+  const handleCancel = () => {
+    setIsModalVisible(false)
+  }
 
   const {
     // data,
@@ -239,10 +249,26 @@ const Journal = () => {
   }
 
   const darkMode = useAppSelector(state => state.theme.darkMode)
+  const userId = user?._id;
+  function formatDate(originalDate: string): string {
+    const date = new Date(originalDate);
+    
+    // Get the year
+    const year = date.getFullYear();
+    
+    // Get the month and pad it with a leading zero if necessary
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    
+    // Get the day and pad it with a leading zero if necessary
+    const day = String(date.getDate()).padStart(2, '0'); // Days are 1-indexed
+    
+    // Return the formatted date string
+    return `${year}-${month}-${day}`;
+  }
 
   return (
     <CustomLayout>
-      <div className='px-10 dark:bg-dark-blue bg-white'>
+      <div className='px-10'>
         <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
           <div className='flex w-full justify-between py-7'>
             <Input.Search
@@ -289,26 +315,37 @@ const Journal = () => {
             <div className='border-b-[0.5px] border-slate-300 mb-3 dark:border-gray-700'>
               <div className='flex justify-between'>
                 <h1 className='text-xl dark:text-white'>Journal</h1>
-                {selectedJournal?.reviewId ? (
-                  <Tag
-                    color='green'
-                    className='flex items-center dark:bg-green-800'
-                  >
-                    {'Reviewed By ' + selectedJournal?.review.userId}
-                  </Tag>
-                ) : (
-                  <div>
-                    <span className='text-orange-500'>Review pending </span>
-                    <Button
-                      onClick={() => {
-                        setShowAddReviewDrawer(true)
-                      }}
-                      className='dark:bg-gray-800 dark:text-white'
+                <Flex>
+                  <Button className='mr-3' onClick={handleButtonClick}>
+                    Get Data
+                  </Button>
+                  <JournalModal
+                    userId={userId}
+                    selectedValue={formatDate(selectedJournal?.updatedAt)}
+                    isVisible={isModalVisible}
+                    onClose={handleCancel}
+                  />
+                  {selectedJournal?.reviewId ? (
+                    <Tag
+                      color='green'
+                      className='flex items-center dark:bg-green-800'
                     >
-                      Add Review
-                    </Button>
-                  </div>
-                )}
+                      {'Reviewed By ' + selectedJournal?.review.userId}
+                    </Tag>
+                  ) : (
+                    <div className='flex flex-col'>
+                      <Button
+                        onClick={() => {
+                          setShowAddReviewDrawer(true)
+                        }}
+                        className='dark:bg-gray-800 dark:text-white'
+                      >
+                        Add Review
+                      </Button>
+                      <span className='text-orange-500'>Review pending </span>
+                    </div>
+                  )}
+                </Flex>
               </div>
               {selectedJournal && (
                 <List

@@ -197,6 +197,8 @@ const MentorsDashboard: React.FC = () => {
     },
   ];
 
+  const darkMode = useAppSelector((state) => state.theme.darkMode);
+
   return (
     <div className="p-10 ">
       {/* SIDE COMPONENT TO DISPLAY TRADER */}
@@ -252,7 +254,7 @@ const MentorsDashboard: React.FC = () => {
           setShowUnasignedTradersDrawer(false);
         }}
       >
-        <h1 className="text-lg">Traders with no mentors assigned</h1>
+        <h1 className="text-lg text-">Traders with no mentors assigned</h1>
         <List
           loading={isTradersLoading}
           dataSource={unAssignedTraders!}
@@ -260,7 +262,7 @@ const MentorsDashboard: React.FC = () => {
             <List.Item onClick={() => {
               setShowAddUserModal(true);
               setSelectedUser(item);
-            }} className=" cursor-pointer hover:bg-slate-100 px-3 " key={item.email}>
+            }} className={`cursor-pointer ${darkMode ? 'hover:bg-slate-400' : 'hover:bg-slate-100'} px-3 text-white`} key={item.email}>
               <List.Item.Meta
                 avatar={<Avatar src={item.profile_image_url || avatar} />}
                 title={<Link to="/">{ !item.firstName?"Couldn't fetch name": item.firstName+" "+item.lastName}</Link>}
