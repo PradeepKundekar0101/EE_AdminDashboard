@@ -321,30 +321,18 @@ const Journal = () => {
                     {'Reviewed By ' + selectedJournal?.review.reviewerId}
                   </Tag>
                 ) : (
-                  <div>
-                    <span className='text-orange-500'>Review pending </span>
+                  <div className='flex flex-col'>
                     <Button
                       onClick={() => {
                         setShowAddReviewDrawer(true)
                       }}
                       className='dark:bg-gray-800 dark:text-white'
                     >
-                      {'Reviewed By ' + selectedJournal?.review.userId}
-                    </Tag>
-                  ) : (
-                    <div className='flex flex-col'>
-                      <Button
-                        onClick={() => {
-                          setShowAddReviewDrawer(true)
-                        }}
-                        className='dark:bg-gray-800 dark:text-white'
-                      >
-                        Add Review
-                      </Button>
-                      <span className='text-orange-500'>Review pending </span>
-                    </div>
-                  )}
-                </Flex>
+                      Add Review
+                    </Button>
+                    <span className='text-orange-500'>Review pending </span>
+                  </div>
+                )}
               </div>
               {selectedJournal && (
                 <List
