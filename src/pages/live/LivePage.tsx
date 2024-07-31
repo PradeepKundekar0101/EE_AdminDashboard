@@ -363,7 +363,7 @@ const Live: React.FC = () => {
           {liveData.map((userData) => (
             <div
               key={userData.user}
-              className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105"
+              className="bg-white  relative rounded-lg shadow-lg overflow-hidden transition-transform duration-300 hover:scale-105"
             >
               {userData.allPositionsClosed && (
                 <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-bold">
