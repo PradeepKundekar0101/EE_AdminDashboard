@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Avatar, ConfigProvider, Dropdown, Layout, Menu } from "antd";
+import { Avatar, ConfigProvider, Dropdown, Layout, Menu,Switch } from "antd";
 import { adminItems, mentorItems } from "../../../utils/menuItems";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { logout } from "../../../redux/slices/authSlice";
 import EditProfile from "../../modals/edit-profile";
-// import { toggleDarkMode } from "../../../redux/slices/themeSlice";
-// import { SunOutlined, MoonOutlined } from "@ant-design/icons";
+import { toggleDarkMode } from "../../../redux/slices/themeSlice";
+import { SunOutlined, MoonOutlined } from "@ant-design/icons";
 
 const { Header, Sider, Content } = Layout;
 
@@ -158,12 +158,12 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
 
         <Layout>
           <Header className="flex justify-end items-center pr-4 dark:bg-dark-blue bg-white">
-            {/* <Switch
+            <Switch
             checkedChildren={<SunOutlined />}
             unCheckedChildren={<MoonOutlined />}
             checked={darkMode}
             onChange={() => dispatch(toggleDarkMode())}
-          /> */}
+          />
             <Dropdown
               menu={{ items }}
               trigger={["click"]}
