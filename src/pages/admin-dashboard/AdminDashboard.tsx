@@ -130,7 +130,7 @@ const AdminDashboard = () => {
 
   return (
     <CustomLayout>
-      <div className="p-10 bg-slate-100">
+      <div className="p-10 bg-slate-100 overflow-y-scroll">
         <h1 className="text-3xl font-semibold">Hello Admin 👋</h1>
         {/* THE 1st ROW CARDS */}
         <Row gutter={16} className="mt-10 ">

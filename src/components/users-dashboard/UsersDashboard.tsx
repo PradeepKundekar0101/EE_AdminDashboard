@@ -119,10 +119,10 @@ const UsersDashboard: React.FC = () => {
 
 
   return (
-    <div className='p-10'>
-      <h1 className='text-2xl font-bold mb-4'>All USERS</h1>
+    <div className=''>
+      {/* <h1 className='text-2xl font-bold mb-4'>All USERS</h1> */}
       <div className='border border-[#EAECF0]'>
-        <Flex justify='space-between' align='center' className='px-6 py-6'>
+        <Flex justify='space-between' align='center' className='px-6 py-2'>
           <div>
             <p>
               <span className='text-lg font-bold mr-2'> Users</span>
