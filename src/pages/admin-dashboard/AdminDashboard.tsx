@@ -139,7 +139,7 @@ const AdminDashboard = () => {
               loading={isSummaryDataLoading}
               title={"Total Holdings Value"}
               value={summaryData?.totalHoldings.toFixed(2).toString()}
-              color={darkMode ?"white": "black"}
+              color={darkMode ? "white" : "black"}
             />
           </Col>
           <Col span={6}>
@@ -147,7 +147,7 @@ const AdminDashboard = () => {
               loading={isSummaryDataLoading}
               title={"Total Holdings Quantity"}
               value={summaryData?.totalHoldingsQuantity.toString()}
-              color={darkMode ?"white": "black"}
+              color={darkMode ? "white" : "black"}
             />
           </Col>
           <Col span={6}>
@@ -155,7 +155,7 @@ const AdminDashboard = () => {
               title={"Today's total PnL"}
               loading={isSummaryDataLoading}
               value={summaryData?.totalPnL.toFixed(2).toString()}
-              color={darkMode ?"white": "black"}
+              color={darkMode ? "white" : "black"}
             />
           </Col>
           <Col span={6}>
@@ -163,7 +163,7 @@ const AdminDashboard = () => {
               loading={isSummaryDataLoading}
               title={"Total's total trades"}
               value={summaryData?.totalTradesQuantity.toString()}
-              color={darkMode ?"white": "black"}
+              color={darkMode ? "white" : "black"}
             />
           </Col>
         </Row>

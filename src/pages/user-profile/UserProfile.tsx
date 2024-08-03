@@ -139,7 +139,7 @@ const [selectedYear, setSelectedYear] = useState(dayjs().year());
 
   return (
     <CustomLayout>
-      <div className="p-10">
+      <div className="p-10  overflow-y-scroll">
         <ProfileSection user={userData && userData?.data} />
         <Row gutter={16} className="mt-10">
           {dataArray.map((item, index) => (
