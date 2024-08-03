@@ -120,7 +120,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
   const darkMode = useAppSelector((state) => state.theme.darkMode);
 
   return (
-    <Layout style={{ height: "100vh" }} className={darkMode ? "dark" : ""}>
+    <Layout style={{ minHeight: "100vh" }}  className={darkMode ? "dark" : ""}>
       <ConfigProvider theme={darkMode ? darkTheme : lightTheme}>
         <Sider
           className="bg-dark-blue"
@@ -173,7 +173,7 @@ const CustomLayout: React.FC<CustomLayoutProps> = ({ children }) => {
             </Header>
           <Content
             style={{ 
-              height: "calc(100vh - 64px)", 
+              // height: "calc(100vh - 64px)", 
               overflowY: "hidden",
               display: "flex",
               flexDirection: "column",
