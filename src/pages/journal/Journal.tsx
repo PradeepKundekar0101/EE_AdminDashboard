@@ -12,6 +12,8 @@ import {
   Upload,
   DatePicker,
   ConfigProvider,
+  Row,
+  Col,
 } from 'antd'
 
 import CustomTable from '../../components/common/table/CustomTable'
@@ -281,9 +283,12 @@ const Journal = () => {
               setShowSideDrawer(false)
               setSelectedJournal(null)
             }}
-            width={'50%'}
+            width={'85%'}
             className='dark:bg-gray-900 dark:text-white'
           >
+            <Row>
+              <Col span={12}>
+             
             <div className='border-b-[0.5px] border-slate-300 mb-3 dark:border-gray-700'>
               <div className='flex justify-between'>
                 <h1 className='text-xl dark:text-white'>Journal</h1>
@@ -420,6 +425,12 @@ const Journal = () => {
                 </Button>
               </div>
             )}
+ </Col>
+ <Col span={6}>
+ 
+ sdf</Col>
+            </Row>
+            
             <Drawer
               width={'60%'}
               onClose={() => {
