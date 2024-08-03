@@ -142,7 +142,7 @@ const BDUsersDashboard: React.FC = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button type="link" href={`/${user?.role}/user/${record._id}`}>
+        <Button type="link" href={`/admin/sales/${record._id}`}>
           View Profile
         </Button>
       ),
