@@ -23,6 +23,7 @@ const AdminDashboard = lazy((): any => import("../pages/admin-dashboard/AdminDas
 const CommunityPage = lazy((): any => import("../pages/community"));
 const LivePage = lazy((): any => import("../pages/live/LivePage"));
 const AllBDUSers = lazy((): any => import("../pages/all-bd-users/AllBDUsers"));
+const BDUserProfile = lazy((): any => import("../pages/bd-user-profile/BDUserProfile"));
 
 const router = createBrowserRouter([
   {
@@ -62,6 +63,7 @@ const router = createBrowserRouter([
           { path: "community", element: <CommunityPage /> },
           { path: "live", element: <LivePage /> },
           { path: "sales", element: <AllBDUSers /> },
+          { path: "sales/:userId", element: <BDUserProfile /> },
         ],
       },
       {
