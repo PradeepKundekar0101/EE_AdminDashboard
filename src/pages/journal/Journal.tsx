@@ -3,7 +3,7 @@ import {
   Carousel,
   CarouselProps,
   Drawer,
-  List,
+  // List,
   Tag,
   Rate,
   Form as AntdForm,
@@ -11,9 +11,7 @@ import {
   message,
   Upload,
   DatePicker,
-  ConfigProvider,
-  Row,
-  Col
+  ConfigProvider
 } from 'antd'
 
 import CustomTable from '../../components/common/table/CustomTable'
@@ -33,6 +31,7 @@ import { UploadOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { JournalTypeSelector } from '../../components/common/journal-type-selector'
 import { ReviewTypeSelector } from '../../components/common/journal-review-selector'
+import JournalMarketSection from '../../components/journal-section/JournalMarketSection'
 
 interface IFormInput {
   review: string
@@ -88,6 +87,8 @@ const Journal = () => {
   const [showSideDrawer, setShowSideDrawer] = useState(false)
   const [showAddReviewDrawer, setShowAddReviewDrawer] = useState(false)
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null)
+  const [preData, setPreData] = useState<null | any>(null)
+  const [postDatas, setPostDatas] = useState<null | any>(null)
 
   const [fileList, setFileList] = useState<any[]>([])
   const { RangePicker } = DatePicker
@@ -154,6 +155,37 @@ const Journal = () => {
     } catch (error: any) {
       message.error(error?.message || 'Upload failed')
     }
+  }
+
+  const handleViewClick = (journal: any) => {
+    setSelectedJournal(journal)
+
+    const journalDate = new Date(journal.createdAt).toISOString().split('T')[0] // Extract the date part
+
+    if (journal.type === 'exit') {
+      // Assuming `journalData.data` holds all your journal entries
+      const entryForSameDate = journalData.data.filter(
+        (item: any) =>
+          item.date === journal.date &&
+          item.type === 'entry' &&
+          new Date(item.createdAt).toISOString().split('T')[0] === journalDate
+      )
+
+      setPreData(entryForSameDate[0])
+      setPostDatas(journal)
+    } else {
+      const entryForSameDate = journalData.data.filter(
+        (item: any) =>
+          item.date === journal.date &&
+          item.type === 'exit' &&
+          new Date(item.createdAt).toISOString().split('T')[0] === journalDate
+      )
+
+      setPreData(journal)
+      setPostDatas(entryForSameDate[0])
+    }
+
+    setShowSideDrawer(true)
   }
 
   const uploadProps = {
@@ -223,6 +255,7 @@ const Journal = () => {
           onClick={() => {
             setShowSideDrawer(true)
             setSelectedJournal(record)
+            handleViewClick(record)
           }}
         >
           View
@@ -242,6 +275,105 @@ const Journal = () => {
   }
 
   const darkMode = useAppSelector(state => state.theme.darkMode)
+  console.log(selectedJournal, 'selectedJournal')
+  console.log(preData, 'preData')
+  console.log(postDatas, 'postDatas')
+  const profitLossColumns = [
+    {
+      title: 'Client ID',
+      dataIndex: 'dhanClientId',
+      key: 'dhanClientId',
+    },
+    {
+      title: 'Trading Symbol',
+      dataIndex: 'tradingSymbol',
+      key: 'tradingSymbol',
+    },
+    {
+      title: 'Position Type',
+      dataIndex: 'positionType',
+      key: 'positionType',
+    },
+    {
+      title: 'Exchange Segment',
+      dataIndex: 'exchangeSegment',
+      key: 'exchangeSegment',
+    },
+    {
+      title: 'Product Type',
+      dataIndex: 'productType',
+      key: 'productType',
+    },
+    {
+      title: 'Buy Avg',
+      dataIndex: 'buyAvg',
+      key: 'buyAvg',
+    },
+    {
+      title: 'Buy Qty',
+      dataIndex: 'buyQty',
+      key: 'buyQty',
+    },
+    {
+      title: 'Sell Avg',
+      dataIndex: 'sellAvg',
+      key: 'sellAvg',
+    },
+    {
+      title: 'Sell Qty',
+      dataIndex: 'sellQty',
+      key: 'sellQty',
+    },
+    {
+      title: 'Net Qty',
+      dataIndex: 'netQty',
+      key: 'netQty',
+    },
+    {
+      title: 'Realized Profit',
+      dataIndex: 'realizedProfit',
+      key: 'realizedProfit',
+    },
+    {
+      title: 'Unrealized Profit',
+      dataIndex: 'unrealizedProfit',
+      key: 'unrealizedProfit',
+    }
+  ];
+
+  const data = [
+    {
+    "dhanClientId": "1000000009",    
+    "tradingSymbol": "TCS",
+    "securityId": "11536",
+    "positionType": "LONG",
+    "exchangeSegment": "NSE_EQ", 
+    "productType": "CNC",
+    "buyAvg": 3345.8,
+    "buyQty": 40,
+    "costPrice": 3215.0,
+    "sellAvg": 0.0,
+    "sellQty": 0,
+    "netQty": 40,
+    "realizedProfit": 0.0,
+    "unrealizedProfit": 6122.0,
+    "rbiReferenceRate": 1.0,
+    "multiplier": 1,
+    "carryForwardBuyQty": 0,
+    "carryForwardSellQty": 0,
+    "carryForwardBuyValue": 0.0,
+    "carryForwardSellValue": 0.0,
+    "dayBuyQty": 40,
+    "daySellQty": 0,
+    "dayBuyValue": 133832.0,
+    "daySellValue": 0.0,
+    "drvExpiryDate": "0001-01-01",
+    "drvOptionType": null,
+    "drvStrikePrice": 0.0,
+    "crossCurrency": false
+    } 
+]
+
 
   return (
     <CustomLayout>
@@ -286,27 +418,37 @@ const Journal = () => {
             onClose={() => {
               setShowSideDrawer(false)
               setSelectedJournal(null)
+              setPostDatas(null)
+              setPreData(null)
             }}
             width={'85%'}
             className='dark:bg-gray-900 dark:text-white'
           >
             <div className=' grid grid-cols-2 grid-rows-2 gap-4 p-4 h-full'>
-              <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
-                <h2 className='text-xl mb-2'>Pre Market</h2>
-                {/* Content for Section 1 */}
-              </div>
-              <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
-                <h2 className='text-xl mb-2'>Post Market</h2>
-                {/* Content for Section 2 */}
-              </div>
+              <JournalMarketSection
+                selectedJournal={preData}
+                setShowAddReviewDrawer={setShowAddReviewDrawer}
+                text='Pre Market'
+              />
+              <JournalMarketSection
+                selectedJournal={postDatas}
+                setShowAddReviewDrawer={setShowAddReviewDrawer}
+                text='Post Market'
+              />
+
               <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
                 <h2 className='text-xl mb-2'>Profit & Loss</h2>
-                {/* Content for Section 3 */}
+                <CustomTable
+                  columns={profitLossColumns}
+                  data={data}
+                  totalDocuments={data.length}
+                  loading={loading}
+                />
               </div>
-              <div className="border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white">
+              <div className='border p-2 overflow-auto shadow-md dark:bg-gray-900 dark:text-white'>
                 <div className='border-b-[0.5px] border-slate-300 mb-3 dark:border-gray-700'>
                   <div className='flex justify-between'>
-                    <h1 className='text-xl dark:text-white'>Journal</h1>
+                    <h1 className='text-xl dark:text-white'>Reviews</h1>
                     {selectedJournal?.reviewId ? (
                       <Tag
                         color='green'
@@ -328,7 +470,7 @@ const Journal = () => {
                       </div>
                     )}
                   </div>
-                  {selectedJournal && (
+                  {/* {selectedJournal && (
                     <List
                       dataSource={selectedJournal.responses}
                       renderItem={(item: any, index: number) => (
@@ -354,7 +496,7 @@ const Journal = () => {
                         </List.Item>
                       )}
                     />
-                  )}
+                  )} */}
                 </div>
 
                 <div className='border-b-[0.5px] border-slate-300 pb-3 mb-3 dark:border-gray-700'>
