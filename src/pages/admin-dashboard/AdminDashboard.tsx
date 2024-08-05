@@ -168,7 +168,7 @@ const AdminDashboard = () => {
           </Col>
         </Row>
         <Flex>
-          <div className="w-[48%] h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white m-5 p-3">
+          <div className="w-[48%] h-[350px] flex flex-col border rounded-xl border-slate-200 dark:bg-dark-blue bg-white m-5 p-3">
             <div className="flex justify-between items-center mb-4">
               <h1 className="text-lg font-semibold">Response trend</h1>
               <DatePicker.RangePicker
@@ -192,19 +192,20 @@ const AdminDashboard = () => {
               />
             )}
           </div>
-          <div className="w-[48%] flex h-[350px] flex-col border rounded-xl border-slate-200 bg-white m-5 p-3">
+          <div className="w-[48%] flex h-[350px] flex-col border rounded-xl border-slate-200 dark:bg-dark-blue bg-white m-5 p-3">
             <h1>Broker Connected User ratio</h1>
             {connectedUsersError && <h1>{connectedUsersError.message}</h1>}
             <RadialSemicircle
               value={
                 Number(connectedUsersRatio?.data?.connected.toFixed(0)) || 0
               }
+              darkMode={darkMode}
             />
           </div>
         </Flex>
 
         <Flex justify="space-between" className="mt-10">
-          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white m-5">
+          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 dark:bg-dark-blue bg-white m-5">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Net P&L</h2>
               <div className="flex items-center space-x-2">
@@ -241,7 +242,7 @@ const AdminDashboard = () => {
             )}
           </div>
 
-          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 bg-white m-5">
+          <div className="w-[48%] p-4 h-[350px] flex flex-col border rounded-xl border-slate-200 dark:bg-dark-blue bg-white m-5">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Overall Win Percentage</h2>
             </div>
