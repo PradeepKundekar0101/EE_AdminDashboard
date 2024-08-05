@@ -543,7 +543,7 @@ const Journal = () => {
                       Review By Mentor/Admin:
                     </h1>
                     {!selectedJournal?.reviewId ? (
-                      <h1 className='dark:text-white'>No Reviews yet</h1>
+                      <h1 className='dark:text-white'>No Reviews available for {selectedJournal?.type}</h1>
                     ) : (
                       <div>
                         <h1 className='w-full px-3 py-2 rounded-md bg-slate-100 border-[0.5px] border-slate-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white'>
