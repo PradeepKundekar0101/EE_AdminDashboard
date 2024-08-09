@@ -9,6 +9,7 @@ import { IUser } from '../../types/data'
 import { ColumnsType } from 'antd/es/table'
 import CustomTable from '../common/table/CustomTable'
 import { useAppSelector } from '../../redux/hooks'
+import { ReloadOutlined } from '@ant-design/icons'
 
 
 const UsersDashboard: React.FC = () => {
@@ -21,6 +22,7 @@ const UsersDashboard: React.FC = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [isLoading,setIsLoading] = useState(false);
   const [searchTerm,setSearchTerm] = useState("");
+  const [refresh, setRefresh] = useState(false)
 
   const fetchAllUser = async()=>{
     try {
@@ -40,7 +42,7 @@ const UsersDashboard: React.FC = () => {
 
   useEffect(()=>{
     fetchAllUser();
-  },[])
+  },[refresh])
   useEffect(()=>{
     if(searchTerm!==""){
       const filteredUser = users.filter((user)=>{
@@ -116,6 +118,9 @@ const UsersDashboard: React.FC = () => {
       ),
     },
   ];
+  const refreshTable = ()=>{
+    setRefresh(!refresh)
+  }
 
 
   return (
@@ -130,13 +135,12 @@ const UsersDashboard: React.FC = () => {
             </p>
            
           </div>
-          <div className='w-1/4'>
+          <div className='w-1/4 flex gap-3'>
+          <Button type='default' shape="circle" onClick={refreshTable} icon={<ReloadOutlined />}/>
             <Input.Search onChange={(e)=>{setSearchTerm(e.target.value)}} value={searchTerm} placeholder='Search'/>
 
             </div>
-          {/* <Button type='default' icon={<CloudDownloadOutlined />}>
-            Export
-          </Button> */}
+            
         </Flex>
       </div>
       <CustomTable totalDocuments={users.length} loading={isLoading} data={users} columns={columns} pageSize={10} />

@@ -32,6 +32,7 @@ import dayjs from 'dayjs'
 import { JournalTypeSelector } from '../../components/common/journal-type-selector'
 import { ReviewTypeSelector } from '../../components/common/journal-review-selector'
 import JournalMarketSection from '../../components/journal-section/JournalMarketSection'
+import { ReloadOutlined } from '@ant-design/icons'
 
 interface IFormInput {
   review: string
@@ -89,7 +90,7 @@ const Journal = () => {
   const [selectedJournal, setSelectedJournal] = useState<null | any>(null)
   const [preData, setPreData] = useState<null | any>(null)
   const [postDatas, setPostDatas] = useState<null | any>(null)
-
+  const [refresh, setRefresh] = useState(false)
   const [fileList, setFileList] = useState<any[]>([])
   const { RangePicker } = DatePicker
 
@@ -124,7 +125,7 @@ const Journal = () => {
 
   useEffect(() => {
     fetchData()
-  }, [filters])
+  }, [filters,refresh ])
   const handleFilterChange = (filterName: string, value: string | string[]) => {
     setFilters(prevFilters => ({
       ...prevFilters,
@@ -273,6 +274,9 @@ const Journal = () => {
       message.error(error?.message || 'Failed to add')
     }
   }
+  const refreshTable = ()=>{
+    setRefresh(!refresh)
+  }
 
   const darkMode = useAppSelector(state => state.theme.darkMode)
   console.log(selectedJournal, 'selectedJournal')
@@ -389,6 +393,7 @@ const Journal = () => {
             />
 
             <div className='flex space-x-3'>
+            <Button type='default' shape="circle" onClick={refreshTable} icon={<ReloadOutlined />}/>
               <JournalTypeSelector handleFilterChange={handleFilterChange} />
               <ReviewTypeSelector handleFilterChange={handleFilterChange} />
               <RangePicker
